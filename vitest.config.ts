@@ -8,5 +8,6 @@ export default defineConfig({
             "dist/*",
             "dist/**/*",
         ],
+        setupFiles: ["dotenv/config"],
     },
 });
