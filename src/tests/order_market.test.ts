@@ -2,8 +2,7 @@ import { expect, test } from "vitest";
 import { RestClientV5 } from "bybit-api";
 import { InstrumentsInfoProvider } from "../InstrumentsInfoProvider.js";
 import { TickerProvider } from "../TickerProvider.js";
-import { OrderContext } from "../OrderContext.js";
-import { Order } from "../models/Order.js";
+import { OrderCoordinator } from "../OrderCoordinator.js";
 
 test("market order creation", {
     timeout: 30 * 1000,
@@ -19,7 +18,9 @@ test("market order creation", {
     const instInfoProvider = new InstrumentsInfoProvider(restClient, instInfo_refetchIntervalMs);
     const tickerProvider = new TickerProvider(restClient);
 
-    const order = new Order({
+    const orderCoordinator = new OrderCoordinator(restClient, instInfoProvider, tickerProvider);
+
+    const orderContext = orderCoordinator.createOrder({
         type: "Market",
         side: "Buy",
         symbol1: "BTCUSDT",
@@ -30,12 +31,12 @@ test("market order creation", {
         //price: "",
         takeProfit: "10000",
         stopLoss: "-10000",
-        executed: false,
-        failed: false,
     });
 
-    const orderContext = new OrderContext(order, restClient, instInfoProvider, tickerProvider);
+    expect(orderCoordinator.OrderContexts.size).toBe(1);
     expect(orderContext.TransitionPromise).toBeDefined();
     if(orderContext.TransitionPromise)
         expect(await orderContext.TransitionPromise).toBeTruthy();
+
+    expect(orderCoordinator.OrderContexts.size).toBe(0);
 });
