@@ -1,3 +1,4 @@
+import EventEmitter from "events";
 import { RestClientV5 } from "bybit-api";
 import { OrderState } from "./OrderState.js";
 import { Residual } from "./ResidualProvider.js";
@@ -10,7 +11,10 @@ import { OrderTransitionExecute } from "./OrderTransitionExecute.js";
 
 export type OrderContextState = "Pending" | "Executed";
 
-export class OrderContext
+export class OrderContext extends EventEmitter<{
+    "executed": [],
+    "state_changed": [OrderState],
+}>
 {
     private order: Order;
     private restClient: RestClientV5;
@@ -23,6 +27,7 @@ export class OrderContext
 
     constructor(order: Order, restClient: RestClientV5, instInfoProvider: InstrumentsInfoProvider, tickerProvider: TickerProvider)
     {
+        super();
         this.order = order;
         this.restClient = restClient;
         this.instInfoProvider = instInfoProvider;
@@ -45,7 +50,11 @@ export class OrderContext
             {
                 this.transitionPromise = this.transitionExecute.doTransition();
                 if(await this.transitionPromise)
+                {
                     this.state = new OrderStateExecuted(this.transitionTo.bind(this));
+                    this.emit("state_changed", this.state);
+                    this.emit("executed");
+                }
             }
             break;
         default:
