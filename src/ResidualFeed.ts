@@ -15,6 +15,8 @@ export class ResidualFeed extends EventEmitter<{
     private latestSymbol1Price?: Decimal; // Y-Axis
     private latestSymbol2Price?: Decimal; // X-Axis
 
+    private currentResidual?: Decimal;
+
     constructor(symbol1: string, symbol2: string, slope: Decimal, wsClient: WebsocketClient)
     {
         super();
@@ -41,6 +43,7 @@ export class ResidualFeed extends EventEmitter<{
 
         const predictedSymbol1Price = this.slope.times(this.latestSymbol2Price);
         const residual = this.latestSymbol1Price.minus(predictedSymbol1Price);
+        this.currentResidual = residual;
         this.emit("update", residual);
     }
 
@@ -54,5 +57,10 @@ export class ResidualFeed extends EventEmitter<{
     {
         this.latestSymbol2Price = new Decimal(trade.p);
         this.priceUpdate();
+    }
+
+    public get CurrentResidual()
+    {
+        return this.currentResidual;
     }
 }
