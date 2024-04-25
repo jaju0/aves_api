@@ -1,4 +1,4 @@
-import { RestClientV5 } from "bybit-api";
+import { RestClientV5, WebsocketClient } from "bybit-api";
 import { Order, OrderType, OrderSide } from "./models/Order.js";
 import { InstrumentsInfoProvider } from "./InstrumentsInfoProvider.js";
 import { TickerProvider } from "./TickerProvider.js";
@@ -16,7 +16,8 @@ export interface OrderCreationParams
     symbol1BaseQty?: string;
     symbol2BaseQty?: string;
     quoteQty?: string;
-    price?: string;
+    entryResidual?: string;
+    regressionSlope: string;
     takeProfit?: string;
     stopLoss?: string;
 }
@@ -25,15 +26,17 @@ export class OrderCoordinator
 {
     private orderContexts: Map<string, OrderContext>;
     private restClient: RestClientV5;
+    private wsClient: WebsocketClient;
     private instInfoProvider: InstrumentsInfoProvider;
     private tickerProvider: TickerProvider;
 
     private initPromise: Promise<void>;
 
-    constructor(restClient: RestClientV5, instInfoProvider: InstrumentsInfoProvider, tickerProvider: TickerProvider)
+    constructor(restClient: RestClientV5, wsClient: WebsocketClient, instInfoProvider: InstrumentsInfoProvider, tickerProvider: TickerProvider)
     {
         this.orderContexts = new Map();
         this.restClient = restClient;
+        this.wsClient = wsClient;
         this.instInfoProvider = instInfoProvider;
         this.tickerProvider = tickerProvider;
 
@@ -50,17 +53,11 @@ export class OrderCoordinator
 
         dbOrder.save();
 
-        const orderContext = new OrderContext(dbOrder, this.restClient, this.instInfoProvider, this.tickerProvider);
-        orderContext.once("executed", this.orderExecuted.bind(this, dbOrder));
+        const orderContext = new OrderContext(dbOrder, this.restClient, this.wsClient, this.instInfoProvider, this.tickerProvider);
+        orderContext.once("executed", this.orderExecuted.bind(this, dbOrder, orderContext));
         this.orderContexts.set(dbOrder._id.toString(), orderContext);
 
         return orderContext;
-    }
-
-    public residualUpdate(residual: Residual)
-    {
-        for(const context of this.orderContexts.values())
-            context.residualUpdate(residual);
     }
 
     public get OrderContexts()
@@ -81,11 +78,12 @@ export class OrderCoordinator
         });
 
         for(const dbOrder of dbOrders)
-            this.orderContexts.set(dbOrder._id.toString(), new OrderContext(dbOrder, this.restClient, this.instInfoProvider, this.tickerProvider));
+            this.orderContexts.set(dbOrder._id.toString(), new OrderContext(dbOrder, this.restClient, this.wsClient, this.instInfoProvider, this.tickerProvider));
     }
 
-    private orderExecuted(dbOrder: Order)
+    private orderExecuted(dbOrder: Order, orderContext: OrderContext)
     {
+        orderContext.shutdown();
         this.orderContexts.delete(dbOrder._id.toString());
     }
 }

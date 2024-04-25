@@ -2,18 +2,17 @@ import Decimal from "decimal.js";
 import { OrderState } from "./OrderState.js";
 import { OrderContext } from "./OrderContext.js";
 
-export class OrderStateExecuted extends OrderState
+export class OrderStateFailed extends OrderState
 {
     constructor(context: OrderContext)
     {
         super(context);
 
         this.context.order.updateOne({
-            executed: true,
+            failed: true,
         });
 
-        this.context.emit("executed");
-        // TODO: create a position in this class
+        this.context.emit("failed");
     }
 
     public async initialize()

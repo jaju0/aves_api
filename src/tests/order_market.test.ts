@@ -1,5 +1,6 @@
 import { expect, test } from "vitest";
-import { RestClientV5 } from "bybit-api";
+import { RestClientV5, WebsocketClient } from "bybit-api";
+import { setTimeout } from "timers/promises";
 import { InstrumentsInfoProvider } from "../InstrumentsInfoProvider.js";
 import { TickerProvider } from "../TickerProvider.js";
 import { OrderCoordinator } from "../OrderCoordinator.js";
@@ -15,10 +16,14 @@ test("market order creation", {
         demoTrading: true,
     });
 
+    const wsClient = new WebsocketClient({
+        market: "v5",
+    });
+
     const instInfoProvider = new InstrumentsInfoProvider(restClient, instInfo_refetchIntervalMs);
     const tickerProvider = new TickerProvider(restClient);
 
-    const orderCoordinator = new OrderCoordinator(restClient, instInfoProvider, tickerProvider);
+    const orderCoordinator = new OrderCoordinator(restClient, wsClient, instInfoProvider, tickerProvider);
 
     const orderContext = orderCoordinator.createOrder({
         type: "Market",
@@ -27,6 +32,7 @@ test("market order creation", {
         symbol2: "ETHUSDT",
         symbol1BaseQty: "0.002",
         symbol2BaseQty: "0.03",
+        regressionSlope: "0",
         //quoteQty: 100,
         //price: "",
         takeProfit: "10000",
@@ -34,9 +40,6 @@ test("market order creation", {
     });
 
     expect(orderCoordinator.OrderContexts.size).toBe(1);
-    expect(orderContext.TransitionPromise).toBeDefined();
-    if(orderContext.TransitionPromise)
-        expect(await orderContext.TransitionPromise).toBeTruthy();
-
-    expect(orderCoordinator.OrderContexts.size).toBe(0);
+    await setTimeout(5 * 1000); // wait five seconds for order to be executed
+    expect(orderCoordinator.OrderContexts.size, "order context still running after 5 seconds").toBe(0);
 });

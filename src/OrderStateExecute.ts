@@ -1,84 +1,92 @@
-import { LinearInverseInstrumentInfoV5, RestClientV5 } from "bybit-api";
+import { LinearInverseInstrumentInfoV5 } from "bybit-api";
 import Decimal from "decimal.js";
-import { TickerProvider } from "./TickerProvider.js";
-import { InstrumentsInfoProvider } from "./InstrumentsInfoProvider.js";
-import { OrderTransitionStrategy } from "./OrderTransitionStrategy.js";
-import { Order } from "./models/Order.js";
+import { OrderContext } from "./OrderContext.js";
+import { OrderState } from "./OrderState.js";
+import { OrderStateExecuted } from "./OrderStateExecuted.js";
+import { OrderStateFailed } from "./OrderStateFailed.js";
 
-export class OrderTransitionExecute implements OrderTransitionStrategy
+export class OrderStateExecute extends OrderState
 {
-    private order: Order;
-    private restClient: RestClientV5;
-    private instInfoProvider: InstrumentsInfoProvider;
-    private tickerProvider: TickerProvider;
-
-    constructor(order: Order, restClient: RestClientV5, instInfoProvider: InstrumentsInfoProvider, tickerProvider: TickerProvider)
+    constructor(context: OrderContext)
     {
-        this.order = order;
-        this.restClient = restClient;
-        this.instInfoProvider = instInfoProvider;
-        this.tickerProvider = tickerProvider;
+        super(context);
     }
 
-    public async doTransition()
+    public async initialize()
     {
-        if(this.order.executed)
-            return true;
+        if(this.context.order.executed)
+        {
+            this.context.transitionTo(new OrderStateExecuted(this.context));
+            return;
+        }
 
-        const symbol1InstInfo = await this.instInfoProvider.get(this.order.symbol1);
-        const symbol2InstInfo = await this.instInfoProvider.get(this.order.symbol2);
+        const symbol1InstInfo = await this.context.instInfoProvider.get(this.context.order.symbol1);
+        const symbol2InstInfo = await this.context.instInfoProvider.get(this.context.order.symbol2);
 
         if(symbol1InstInfo === undefined || symbol2InstInfo === undefined)
-            return false;
+        {
+            this.context.transitionTo(new OrderStateFailed(this.context));
+            return;
+        }
 
         let roundedContractSizes: ReturnType<typeof this.roundContractSizes>;
-        if(this.order.quoteQty !== undefined)
+        if(this.context.order.quoteQty !== undefined)
         {
-            const contractSizes = await this.calculateContractSizesFromQuoteQuantity(new Decimal(this.order.quoteQty));
+            const contractSizes = await this.calculateContractSizesFromQuoteQuantity(new Decimal(this.context.order.quoteQty));
             if(contractSizes === undefined)
-                return false;
+            {
+                this.context.transitionTo(new OrderStateFailed(this.context));
+                return;
+            }
 
             roundedContractSizes = this.roundContractSizes(contractSizes.symbol1ContractSize, contractSizes.symbol2ContractSize, symbol1InstInfo, symbol2InstInfo);
         }
-        else if(this.order.symbol1BaseQty !== undefined && this.order.symbol2BaseQty !== undefined)
+        else if(this.context.order.symbol1BaseQty !== undefined && this.context.order.symbol2BaseQty !== undefined)
         {
-            const symbol1ContractSize = new Decimal(this.order.symbol1BaseQty);
-            const symbol2ContractSize = new Decimal(this.order.symbol2BaseQty);
+            const symbol1ContractSize = new Decimal(this.context.order.symbol1BaseQty);
+            const symbol2ContractSize = new Decimal(this.context.order.symbol2BaseQty);
 
             roundedContractSizes = this.roundContractSizes(symbol1ContractSize, symbol2ContractSize, symbol1InstInfo, symbol2InstInfo);
         }
         else
-            return false;
+        {
+            this.context.transitionTo(new OrderStateFailed(this.context));
+            return;
+        }
 
-        await this.restClient.submitOrder({
+        await this.context.restClient.submitOrder({
             category: "linear",
             orderType: "Market",
-            side: this.order.side,
-            symbol: this.order.symbol1,
+            side: this.context.order.side,
+            symbol: this.context.order.symbol1,
             qty: roundedContractSizes.symbol1ContractSize.toString(),
         });
 
-        await this.restClient.submitOrder({
+        await this.context.restClient.submitOrder({
             category: "linear",
             orderType: "Market",
-            side: this.order.side === "Buy" ? "Sell" : "Buy",
-            symbol: this.order.symbol2,
+            side: this.context.order.side === "Buy" ? "Sell" : "Buy",
+            symbol: this.context.order.symbol2,
             qty: roundedContractSizes.symbol2ContractSize.toString(),
         });
 
-        this.order.updateOne({
+        this.context.order.updateOne({
             symbol1BaseQty: roundedContractSizes.symbol1ContractSize.toString(),
             symbol2BaseQty: roundedContractSizes.symbol2ContractSize.toString(),
-            executed: true,
+            entryResidual: this.context.residualFeed?.CurrentResidual?.toString(),
         });
 
-        return true;
+        this.context.transitionTo(new OrderStateExecuted(this.context));
+    }
+
+    public residualUpdate(residual: Decimal)
+    {
     }
 
     private async calculateContractSizesFromQuoteQuantity(quoteQty: Decimal)
     {
-        const symbol1Tickers = await this.tickerProvider.get(this.order.symbol1);
-        const symbol2Tickers = await this.tickerProvider.get(this.order.symbol2);
+        const symbol1Tickers = await this.context.tickerProvider.get(this.context.order.symbol1);
+        const symbol2Tickers = await this.context.tickerProvider.get(this.context.order.symbol2);
 
         if(symbol1Tickers === undefined || symbol2Tickers === undefined)
             return undefined;

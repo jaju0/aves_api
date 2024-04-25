@@ -1,14 +1,16 @@
-import { OrderContextState } from "./OrderContext.js";
+import Decimal from "decimal.js";
+import { OrderContext } from "./OrderContext.js";
 import { Residual } from "./ResidualProvider.js";
 
 export abstract class OrderState
 {
-    protected transitionTo: (state: OrderContextState) => Promise<void>;
+    protected context: OrderContext;
 
-    constructor(transitionTo: (state: OrderContextState) => Promise<void>)
+    constructor(context: OrderContext)
     {
-        this.transitionTo = transitionTo;
+        this.context = context;
     }
 
-    abstract residualUpdate(residual: Residual): void;
+    public abstract initialize(): Promise<void>;
+    public abstract residualUpdate(residual: Decimal): void;
 }
