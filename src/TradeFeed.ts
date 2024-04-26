@@ -26,7 +26,7 @@ export class TradeFeed extends EventEmitter<{
         this.wsClient = wsClient;
         this.wsClient.on("update", this.websocketUpdate.bind(this));
         this.topic = `publicTrade.${symbol}`;
-        this.wsClient.subscribeV5(this.topic, "linear");
+        this.wsClient.subscribeV5(this.topic, "linear").catch(reason => console.log(reason));
     }
 
     public shutdown()
