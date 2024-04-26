@@ -4,9 +4,11 @@ import { setTimeout } from "timers/promises";
 import { InstrumentsInfoProvider } from "../InstrumentsInfoProvider.js";
 import { TickerProvider } from "../TickerProvider.js";
 import { OrderCoordinator } from "../OrderCoordinator.js";
+import { PositionCoordinator } from "../PositionCoordinator.js";
+import { PnlCalculator } from "../PnlCalculator.js";
 
 test("market order creation", {
-    timeout: 30 * 1000,
+    timeout: 40 * 1000,
 }, async () => {
     const instInfo_refetchIntervalMs = 24 * 60 * 60 * 1000;
 
@@ -22,8 +24,10 @@ test("market order creation", {
 
     const instInfoProvider = new InstrumentsInfoProvider(restClient, instInfo_refetchIntervalMs);
     const tickerProvider = new TickerProvider(restClient);
+    const pnlCalculator = new PnlCalculator(tickerProvider);
 
-    const orderCoordinator = new OrderCoordinator(restClient, wsClient, instInfoProvider, tickerProvider);
+    const positionCoordinator = new PositionCoordinator(restClient, wsClient, pnlCalculator);
+    const orderCoordinator = new OrderCoordinator(restClient, wsClient, instInfoProvider, tickerProvider, positionCoordinator);
 
     const orderContext = orderCoordinator.createOrder({
         type: "Market",
@@ -42,4 +46,9 @@ test("market order creation", {
     expect(orderCoordinator.OrderContexts.size).toBe(1);
     await setTimeout(5 * 1000); // wait five seconds for order to be executed
     expect(orderCoordinator.OrderContexts.size, "order context still running after 5 seconds").toBe(0);
+    await positionCoordinator.liquidateAll();
+    expect(positionCoordinator.PositionContexts.size).toBe(1);
+
+    await positionCoordinator.shutdown();
+    wsClient.closeAll(true);
 });
