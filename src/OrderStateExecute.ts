@@ -54,7 +54,7 @@ export class OrderStateExecute extends OrderState
             return;
         }
 
-        await this.context.restClient.submitOrder({
+        const symbol1SubmitionResponse = await this.context.restClient.submitOrder({
             category: "linear",
             orderType: "Market",
             side: this.context.order.side,
@@ -62,13 +62,25 @@ export class OrderStateExecute extends OrderState
             qty: roundedContractSizes.symbol1ContractSize.toString(),
         });
 
-        await this.context.restClient.submitOrder({
+        const symbol2SubmitionResponse = await this.context.restClient.submitOrder({
             category: "linear",
             orderType: "Market",
             side: this.context.order.side === "Buy" ? "Sell" : "Buy",
             symbol: this.context.order.symbol2,
             qty: roundedContractSizes.symbol2ContractSize.toString(),
         });
+
+        if(
+            symbol1SubmitionResponse === undefined || symbol1SubmitionResponse.retCode !== 0 ||
+            symbol2SubmitionResponse === undefined || symbol2SubmitionResponse.retCode !== 0
+        )
+        {
+            this.context.transitionTo(new OrderStateFailed(this.context));
+            return;
+        }
+
+        this.context.symbol1OrderId = symbol1SubmitionResponse.result.orderId;
+        this.context.symbol2OrderId = symbol2SubmitionResponse.result.orderId;
 
         this.context.order.updateOne({
             symbol1BaseQty: roundedContractSizes.symbol1ContractSize.toString(),

@@ -21,6 +21,8 @@ export class OrderContext extends EventEmitter<{
     public readonly instInfoProvider: InstrumentsInfoProvider;
     public readonly tickerProvider: TickerProvider;
     public residualFeed?: ResidualFeed;
+    public symbol1OrderId?: string;
+    public symbol2OrderId?: string;
 
     private state: OrderState;
 
