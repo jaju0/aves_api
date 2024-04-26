@@ -44,6 +44,7 @@ export class OrderContext extends EventEmitter<{
     public async shutdown()
     {
         this.residualFeed?.off("update", this.residualUpdate.bind(this));
+        this.residualFeed?.shutdown();
     }
 
     public async transitionTo(state: OrderState)
