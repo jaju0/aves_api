@@ -53,8 +53,8 @@ export class OrderStatePending extends OrderState
         const fromTopTriggered = this.triggerDirection === "FromTop" && residual.lessThan(this.entryResidual);
         const triggered = fromBottomTriggered || fromTopTriggered;
 
-        if(triggered)
-            this.context.transitionTo(new OrderStateExecute(this.context));
+        if(triggered && !(this.context.State instanceof OrderStateExecute))
+            await this.context.transitionTo(new OrderStateExecute(this.context));
     }
 
 }
