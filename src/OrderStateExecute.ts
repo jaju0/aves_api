@@ -120,6 +120,7 @@ export class OrderStateExecute extends OrderState
         let symbol1ContractSize: Decimal;
         let symbol2ContractSize: Decimal;
 
+        Decimal.set({ rounding: Decimal.ROUND_HALF_CEIL });
         symbol1ContractSize = new Decimal(symbol1BaseAssetValue).dividedBy(symbol1QtyStep).round().times(symbol1QtyStep);
         symbol2ContractSize = new Decimal(symbol2BaseAssetValue).dividedBy(symbol2QtyStep).round().times(symbol2QtyStep);
 
