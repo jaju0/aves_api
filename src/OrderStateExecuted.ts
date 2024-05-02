@@ -48,7 +48,10 @@ export class OrderStateExecuted extends OrderState
             symbol2EntryPrice: symbol2FilledPrice,
         });
 
-        this.context.order.updateOne({
+        this.context.order.executed = true;
+        this.context.order.save();
+
+        await this.context.order.updateOne({
             executed: true,
         });
 
