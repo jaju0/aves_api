@@ -27,7 +27,7 @@ export class OrderContext extends EventEmitter<{
     public symbol1OrderId?: string;
     public symbol2OrderId?: string;
 
-    private state: OrderState;
+    private state?: OrderState;
 
     constructor(order: Order, restClient: RestClientV5, wsClient: WebsocketClient, instInfoProvider: InstrumentsInfoProvider, tickerProvider: TickerProvider, positionCoordinator: PositionCoordinator)
     {
@@ -40,9 +40,12 @@ export class OrderContext extends EventEmitter<{
         this.positionCoordinator = positionCoordinator;
 
         if(this.order.executed)
-            this.state = new OrderStateExecuted(this);
+        {
+            this.transitionTo(new OrderStateExecuted(this));
+            return;
+        }
 
-        this.state = new OrderStatePending(this);
+        this.transitionTo(new OrderStatePending(this));
     }
 
     public async shutdown()
@@ -60,7 +63,11 @@ export class OrderContext extends EventEmitter<{
 
     public residualUpdate(residual: Decimal)
     {
-        this.state.residualUpdate(residual);
+        this.state?.residualUpdate(residual);
     }
 
+    public get State()
+    {
+        return this.state;
+    }
 }
