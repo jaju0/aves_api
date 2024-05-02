@@ -14,7 +14,7 @@ export class OrderStateExecuted extends OrderState
     {
         if(this.context.symbol1OrderId === undefined || this.context.symbol2OrderId === undefined)
         {
-            this.context.transitionTo(new OrderStateFailed(this.context));
+            await this.context.transitionTo(new OrderStateFailed(this.context));
             return;
         }
 
@@ -27,7 +27,7 @@ export class OrderStateExecuted extends OrderState
             symbol2OrderResponse.result.list.length === 0
         )
         {
-            this.context.transitionTo(new OrderStateExecuted(this.context)); // retry
+            await this.context.transitionTo(new OrderStateExecuted(this.context)); // retry
             return;
         }
 

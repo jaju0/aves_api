@@ -16,7 +16,7 @@ export class OrderStateExecute extends OrderState
     {
         if(this.context.order.executed)
         {
-            this.context.transitionTo(new OrderStateExecuted(this.context));
+            await this.context.transitionTo(new OrderStateExecuted(this.context));
             return;
         }
 
@@ -25,7 +25,7 @@ export class OrderStateExecute extends OrderState
 
         if(symbol1InstInfo === undefined || symbol2InstInfo === undefined)
         {
-            this.context.transitionTo(new OrderStateFailed(this.context));
+            await this.context.transitionTo(new OrderStateFailed(this.context));
             return;
         }
 
@@ -35,7 +35,7 @@ export class OrderStateExecute extends OrderState
             const contractSizes = await this.calculateContractSizesFromQuoteQuantity(new Decimal(this.context.order.quoteQty));
             if(contractSizes === undefined)
             {
-                this.context.transitionTo(new OrderStateFailed(this.context));
+                await this.context.transitionTo(new OrderStateFailed(this.context));
                 return;
             }
 
@@ -50,7 +50,7 @@ export class OrderStateExecute extends OrderState
         }
         else
         {
-            this.context.transitionTo(new OrderStateFailed(this.context));
+            await this.context.transitionTo(new OrderStateFailed(this.context));
             return;
         }
 
@@ -75,7 +75,7 @@ export class OrderStateExecute extends OrderState
             symbol2SubmitionResponse === undefined || symbol2SubmitionResponse.retCode !== 0
         )
         {
-            this.context.transitionTo(new OrderStateFailed(this.context));
+            await this.context.transitionTo(new OrderStateFailed(this.context));
             return;
         }
 
@@ -88,7 +88,7 @@ export class OrderStateExecute extends OrderState
             entryResidual: this.context.residualFeed?.CurrentResidual?.toString(),
         });
 
-        this.context.transitionTo(new OrderStateExecuted(this.context));
+        await this.context.transitionTo(new OrderStateExecuted(this.context));
     }
 
     public residualUpdate(residual: Decimal)
