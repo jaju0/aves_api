@@ -14,20 +14,14 @@ export class OrderStatePending extends OrderState
     constructor(context: OrderContext)
     {
         super(context);
-
-        this.context.residualFeed = new ResidualFeed(
-            this.context.order.symbol1,
-            this.context.order.symbol2,
-            new Decimal(this.context.order.regressionSlope),
-            this.context.wsClient
-        );
-
-        this.context.residualFeed.on("update", this.context.residualUpdate.bind(this.context));
-
         this.triggerDirection = "None";
+    }
+
+    public async initialize()
+    {
         if(this.context.order.type === "Market")
         {
-            this.context.transitionTo(new OrderStateExecute(this.context));
+            await this.context.transitionTo(new OrderStateExecute(this.context));
             return;
         }
         else if(this.context.order.type === "Limit")
@@ -39,14 +33,18 @@ export class OrderStatePending extends OrderState
             throw new Error("order is of type limit/stop and price is not set");
 
         this.entryResidual = +this.context.order.entryResidual;
+
+        this.context.residualFeed = new ResidualFeed(
+            this.context.order.symbol1,
+            this.context.order.symbol2,
+            new Decimal(this.context.order.regressionSlope),
+            this.context.wsClient
+        );
+
+        this.context.residualFeed.on("update", this.context.residualUpdate.bind(this.context));
     }
 
-    public async initialize()
-    {
-
-    }
-
-    public residualUpdate(residual: Decimal)
+    public async residualUpdate(residual: Decimal)
     {
         if(this.entryResidual === undefined)
             return;
