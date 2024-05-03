@@ -2,7 +2,7 @@ import { RestClientV5, WebsocketClient } from "bybit-api";
 import Decimal from "decimal.js";
 import { PnlCalculator } from "./PnlCalculator.js";
 import { PositionContext } from "./PositionContext.js";
-import { Position, PositionSide } from "./models/Position.js";
+import { Position, PositionSide } from "../models/Position.js";
 
 export interface AddToPositionParams
 {

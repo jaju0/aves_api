@@ -1,7 +1,7 @@
 import { RestClientV5, WebsocketClient } from "bybit-api";
 import { expect, test } from "vitest";
-import { KlineProvider } from "../KlineProvider.js";
-import { ResidualProvider } from "../ResidualProvider.js";
+import { KlineProvider } from "../core/KlineProvider.js";
+import { ResidualProvider } from "../core/ResidualProvider.js";
 
 test("ResidualProvider", async () => {
     const restClient = new RestClientV5();

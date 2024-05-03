@@ -1,11 +1,11 @@
 import { expect, test } from "vitest";
 import { RestClientV5, WebsocketClient } from "bybit-api";
 import { setTimeout } from "timers/promises";
-import { InstrumentsInfoProvider } from "../InstrumentsInfoProvider.js";
-import { TickerProvider } from "../TickerProvider.js";
-import { OrderCoordinator } from "../OrderCoordinator.js";
-import { PositionCoordinator } from "../PositionCoordinator.js";
-import { PnlCalculator } from "../PnlCalculator.js";
+import { InstrumentsInfoProvider } from "../core/InstrumentsInfoProvider.js";
+import { TickerProvider } from "../core/TickerProvider.js";
+import { OrderCoordinator } from "../core/OrderCoordinator.js";
+import { PositionCoordinator } from "../core/PositionCoordinator.js";
+import { PnlCalculator } from "../core/PnlCalculator.js";
 
 test("market order creation", {
     timeout: 40 * 1000,

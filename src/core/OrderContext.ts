@@ -4,7 +4,7 @@ import Decimal from "decimal.js";
 import { OrderState } from "./OrderState.js";
 import { InstrumentsInfoProvider } from "./InstrumentsInfoProvider.js";
 import { TickerProvider } from "./TickerProvider.js";
-import { Order } from "./models/Order.js";
+import { Order } from "../models/Order.js";
 import { OrderStateExecuted } from "./OrderStateExecuted.js";
 import { OrderStatePending } from "./OrderStatePending.js";
 import { ResidualFeed } from "./ResidualFeed.js";

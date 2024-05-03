@@ -1,6 +1,6 @@
 import { RestClientV5, WebsocketClient } from "bybit-api";
 import Decimal from "decimal.js";
-import { Position } from "./models/Position.js";
+import { Position } from "../models/Position.js";
 import { PositionState } from "./PositionState.js";
 import { PositionStatePending } from "./PositionStatePending.js";
 import { PositionStateClosed } from "./PositionStateClosed.js";

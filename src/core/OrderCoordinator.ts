@@ -1,5 +1,5 @@
 import { RestClientV5, WebsocketClient } from "bybit-api";
-import { Order, OrderType, OrderSide } from "./models/Order.js";
+import { Order, OrderType, OrderSide } from "../models/Order.js";
 import { InstrumentsInfoProvider } from "./InstrumentsInfoProvider.js";
 import { TickerProvider } from "./TickerProvider.js";
 import { OrderContext } from "./OrderContext.js";

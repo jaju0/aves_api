@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { OrderSide, OrderType } from "../../../models/Order.js";
 import { Credential } from "../../../models/Credential.js";
-import { OrderCoordinatorProvider } from "../../../OrderCoordinatorProvider.js";
+import { OrderCoordinatorProvider } from "../../../core/OrderCoordinatorProvider.js";
 
 export interface BaseQty
 {

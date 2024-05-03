@@ -23,6 +23,12 @@ export class InstrumentsInfoProvider
         return this.instrumentsInfo.get(symbol);
     }
 
+    public async getSymbols()
+    {
+        await this.instrumentsInfoPromise;
+        return Array.from(this.instrumentsInfo.keys());
+    }
+
     private async fetch()
     {
         try

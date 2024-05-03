@@ -3,7 +3,7 @@ import { BybitRestClientProvider } from "./BybitRestClientProvider.js";
 import { OrderCoordinator } from "./OrderCoordinator.js";
 import { InstrumentsInfoProvider } from "./InstrumentsInfoProvider.js";
 import { TickerProvider } from "./TickerProvider.js";
-import { PositionCoordinatorProvider } from "PositionCoordinatorProvider.js";
+import { PositionCoordinatorProvider } from "core/PositionCoordinatorProvider.js";
 
 export class OrderCoordinatorProvider
 {
@@ -37,4 +37,7 @@ export class OrderCoordinatorProvider
 
         return foundOrderCoordinator;
     }
+
+
+    // TODO: implement a function to load existing orders for startup
 }

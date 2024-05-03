@@ -1,5 +1,5 @@
 import Decimal from "decimal.js";
-import { Position, PositionSide } from "./models/Position.js";
+import { Position, PositionSide } from "../models/Position.js";
 import { TickerProvider } from "./TickerProvider.js";
 
 export class PnlCalculator

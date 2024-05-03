@@ -2,7 +2,7 @@ import Decimal from "decimal.js";
 import { PositionState } from "./PositionState.js";
 import { PositionContext } from "./PositionContext.js";
 import { PositionStatePending } from "./PositionStatePending.js";
-import { PositionSide } from "./models/Position.js";
+import { PositionSide } from "../models/Position.js";
 
 export class PositionStateClosed extends PositionState
 {

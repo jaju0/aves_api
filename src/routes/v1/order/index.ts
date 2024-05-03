@@ -1,7 +1,7 @@
 import express from "express";
 import passport from "passport";
 import { orderSubmitionHandler } from "./controllers.js";
-import { OrderCoordinatorProvider } from "../../../OrderCoordinatorProvider.js";
+import { OrderCoordinatorProvider } from "../../../core/OrderCoordinatorProvider.js";
 import { schemaValidator } from "../schemaValidator.js";
 
 export function orderRouter(orderCoordinatorProvider: OrderCoordinatorProvider)

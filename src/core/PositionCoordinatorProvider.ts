@@ -31,4 +31,6 @@ export class PositionCoordinatorProvider
 
         return foundPositionCoordinator;
     }
+
+    // TODO: implement a function to load existing positions for startup
 }

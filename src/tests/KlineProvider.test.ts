@@ -1,6 +1,6 @@
 import { test, expect } from "vitest";
 import { OHLCVKlineV5, RestClientV5, WebsocketClient } from "bybit-api";
-import { KlineProvider, WSKline } from "../KlineProvider.js";
+import { KlineProvider, WSKline } from "../core/KlineProvider.js";
 
 test("KlineProvider", async () => {
     const restClient = new RestClientV5();
