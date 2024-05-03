@@ -1,7 +1,10 @@
 import mongoose, { Model } from "mongoose";
 
-export type OrderType = "Market" | "Limit" | "Stop";
-export type OrderSide = "Buy" | "Sell";
+export const orderType = ["Market", "Limit", "Stop"] as const;
+export type OrderType = typeof orderType[number];
+
+export const orderSide = ["Buy", "Sell"] as const;
+export type OrderSide = typeof orderSide[number];
 
 export interface IOrder
 {
