@@ -2,7 +2,7 @@ import mongoose, { Model } from "mongoose";
 
 export type PositionSide = "None" | "Long" | "Short";
 
-export interface IPosition
+export interface IPosition extends mongoose.Document
 {
     side: PositionSide;
     symbol1: string;

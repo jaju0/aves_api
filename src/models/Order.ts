@@ -6,7 +6,7 @@ export type OrderType = typeof orderType[number];
 export const orderSide = ["Buy", "Sell"] as const;
 export type OrderSide = typeof orderSide[number];
 
-export interface IOrder
+export interface IOrder extends mongoose.Document
 {
     type: OrderType;
     side: OrderSide;
