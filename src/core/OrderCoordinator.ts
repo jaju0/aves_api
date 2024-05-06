@@ -60,6 +60,11 @@ export class OrderCoordinator
         return orderContext;
     }
 
+    public getOrderData(orderId: string)
+    {
+        return this.orderContexts.get(orderId);
+    }
+
     public get OrderContexts()
     {
         return this.orderContexts;
@@ -78,12 +83,12 @@ export class OrderCoordinator
         });
 
         for(const dbOrder of dbOrders)
-            this.orderContexts.set(dbOrder._id.toString(), new OrderContext(dbOrder, this.restClient, this.wsClient, this.instInfoProvider, this.tickerProvider, this.positionCoordinator));
+            this.orderContexts.set(dbOrder.id, new OrderContext(dbOrder, this.restClient, this.wsClient, this.instInfoProvider, this.tickerProvider, this.positionCoordinator));
     }
 
     private orderExecuted(dbOrder: Order, orderContext: OrderContext)
     {
         orderContext.shutdown();
-        this.orderContexts.delete(dbOrder._id.toString());
+        this.orderContexts.delete(dbOrder.id);
     }
 }
