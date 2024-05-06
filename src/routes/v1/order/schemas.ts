@@ -20,7 +20,7 @@ export const submitOrder = Joi.object({
 });
 
 export const amendOrder = Joi.object({
-    _id: Joi.string().required(),
+    orderId: Joi.string().required(),
     entryResidual: Joi.number().required(),
 })
 
