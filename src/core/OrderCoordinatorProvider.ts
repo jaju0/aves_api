@@ -33,6 +33,7 @@ export class OrderCoordinatorProvider
             const restClient = this.bybitRestClientProvider.get(apiKey, apiSecret, demoTrading);
             const positionCoordinator = this.positionCoordinatorProvider.get(apiKey, apiSecret, demoTrading);
             foundOrderCoordinator = new OrderCoordinator(restClient, this.wsClient, this.instInfoProvider, this.tickerProvider, positionCoordinator);
+            this.orderCoordinators.set(apiKey, foundOrderCoordinator);
         }
 
         return foundOrderCoordinator;
