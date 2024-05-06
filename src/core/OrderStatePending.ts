@@ -3,12 +3,12 @@ import { OrderState } from "./OrderState.js";
 import { OrderContext } from "./OrderContext.js";
 import { OrderStateExecute } from "./OrderStateExecute.js";
 import { ResidualFeed } from "./ResidualFeed.js";
+import { OrderStateFailed } from "./OrderStateFailed.js";
 
 type TriggerDirection = "None" | "FromTop" | "FromBottom";
 
 export class OrderStatePending extends OrderState
 {
-    private entryResidual?: number;
     private triggerDirection: TriggerDirection;
 
     constructor(context: OrderContext)
@@ -30,9 +30,10 @@ export class OrderStatePending extends OrderState
             this.triggerDirection = this.context.order.side === "Buy" ? "FromBottom" : "FromTop";
 
         if(this.context.order.entryResidual === undefined)
-            throw new Error("order is of type limit/stop and price is not set");
-
-        this.entryResidual = +this.context.order.entryResidual;
+        {
+            this.context.transitionTo(new OrderStateFailed(this.context));
+            return;
+        }
 
         this.context.residualFeed = new ResidualFeed(
             this.context.order.symbol1,
@@ -46,11 +47,18 @@ export class OrderStatePending extends OrderState
 
     public async residualUpdate(residual: Decimal)
     {
-        if(this.entryResidual === undefined)
+        if(this.context.order.entryResidual === undefined)
+        {
+            this.context.transitionTo(new OrderStateFailed(this.context));
+            return;
+        }
+
+        const entryResidual = +this.context.order.entryResidual;
+        if(entryResidual === undefined)
             return;
 
-        const fromBottomTriggered = this.triggerDirection === "FromBottom" && residual.greaterThan(this.entryResidual);
-        const fromTopTriggered = this.triggerDirection === "FromTop" && residual.lessThan(this.entryResidual);
+        const fromBottomTriggered = this.triggerDirection === "FromBottom" && residual.greaterThan(entryResidual);
+        const fromTopTriggered = this.triggerDirection === "FromTop" && residual.lessThan(entryResidual);
         const triggered = fromBottomTriggered || fromTopTriggered;
 
         if(triggered && !(this.context.State instanceof OrderStateExecute))
