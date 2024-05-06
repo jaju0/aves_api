@@ -19,6 +19,12 @@ export const submitOrder = Joi.object({
     baseQty: Joi.number().optional(), // TODO: this must exist if quoteQty is undefined
 });
 
+export const amendOrder = Joi.object({
+    _id: Joi.string().required(),
+    entryResidual: Joi.number().required(),
+})
+
 export default {
     "/order/submit": submitOrder,
+    "/order/amend": amendOrder,
 } as { [key: string]: Joi.ObjectSchema };
