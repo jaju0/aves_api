@@ -100,6 +100,7 @@ export async function orderSubmitionHandler(orderCoordinatorProvider: OrderCoord
         stopLoss: req.body.stopLoss?.toString(),
         symbol1BaseQty: req.body.baseQty?.symbol1BaseQty.toString(),
         symbol2BaseQty: req.body.baseQty?.symbol2BaseQty.toString(),
+        quoteQty: req.body.quoteQty?.toString(),
     });
 
     return res.json({
