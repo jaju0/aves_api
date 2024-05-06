@@ -48,6 +48,12 @@ export class OrderContext extends EventEmitter<{
         this.transitionTo(new OrderStatePending(this));
     }
 
+    public async amendEntryResidual(entryResidual: number)
+    {
+        this.order.entryResidual = entryResidual.toString();
+        await this.order.save();
+    }
+
     public async shutdown()
     {
         this.residualFeed?.off("update", this.residualUpdate.bind(this));
