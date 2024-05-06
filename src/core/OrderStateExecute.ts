@@ -82,11 +82,10 @@ export class OrderStateExecute extends OrderState
         this.context.symbol1OrderId = symbol1SubmitionResponse.result.orderId;
         this.context.symbol2OrderId = symbol2SubmitionResponse.result.orderId;
 
-        this.context.order.updateOne({
-            symbol1BaseQty: roundedContractSizes.symbol1ContractSize.toString(),
-            symbol2BaseQty: roundedContractSizes.symbol2ContractSize.toString(),
-            entryResidual: this.context.residualFeed?.CurrentResidual?.toString(),
-        });
+        this.context.order.symbol1BaseQty = roundedContractSizes.symbol1ContractSize.toString();
+        this.context.order.symbol2BaseQty = roundedContractSizes.symbol2ContractSize.toString();
+        this.context.order.entryResidual = this.context.residualFeed?.CurrentResidual?.toString();
+        await this.context.order.save();
 
         await this.context.transitionTo(new OrderStateExecuted(this.context));
     }

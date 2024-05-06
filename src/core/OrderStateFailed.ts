@@ -8,9 +8,8 @@ export class OrderStateFailed extends OrderState
     {
         super(context);
 
-        this.context.order.updateOne({
-            failed: true,
-        });
+        this.context.order.failed = true;
+        this.context.order.save();
 
         this.context.emit("failed");
     }

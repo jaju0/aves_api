@@ -83,12 +83,11 @@ export class PositionStatePending extends PositionState
         const newSymbol2EntryPrice = oldSymbol2ContractValue.plus(newSymbol2ContractValue).dividedBy(newSymbol2BaseQty);
 
 
-        this.context.position.updateOne({
-            symbol1BaseQty: newSymbol1BaseQty.toString(),
-            symbol1EntryPrice: newSymbol1EntryPrice.toString(),
-            symbol2BaseQty: newSymbol2BaseQty.toString(),
-            symbol2EntryPrice: newSymbol2EntryPrice.toString(),
-        });
+        this.context.position.symbol1BaseQty = newSymbol1BaseQty.toString();
+        this.context.position.symbol1EntryPrice = newSymbol1EntryPrice.toString();
+        this.context.position.symbol2BaseQty = newSymbol2BaseQty.toString();
+        this.context.position.symbol2EntryPrice = newSymbol2EntryPrice.toString();
+        await this.context.position.save();
     }
 
     public async remove(symbol1BaseQty: Decimal, symbol1EntryPrice: Decimal, symbol2BaseQty: Decimal, symbol2EntryPrice: Decimal)

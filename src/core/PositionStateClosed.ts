@@ -10,14 +10,13 @@ export class PositionStateClosed extends PositionState
     {
         super(context);
 
-        this.context.position.updateOne({
-            side: "None",
-            open: false,
-            symbol1BaseQty: "",
-            symbol2BaseQty: "",
-            symbol1EntryPrice: "",
-            symbol2EntryPrice: "",
-        });
+        this.context.position.side = "None";
+        this.context.position.open = false;
+        this.context.position.symbol1BaseQty  = "";
+        this.context.position.symbol2BaseQty = "";
+        this.context.position.symbol1EntryPrice = "";
+        this.context.position.symbol2EntryPrice = "";
+        this.context.position.save();
     }
 
     public async initialize()
@@ -30,12 +29,11 @@ export class PositionStateClosed extends PositionState
 
     public async add(symbol1BaseQty: Decimal, symbol1EntryPrice: Decimal, symbol2BaseQty: Decimal, symbol2EntryPrice: Decimal)
     {
-        await this.context.position.updateOne({
-            symbol1BaseQty: symbol1BaseQty.toString(),
-            symbol2BaseQty: symbol2BaseQty.toString(),
-            symbol1EntryPrice: symbol1EntryPrice.toString(),
-            symbol2EntryPrice: symbol2EntryPrice.toString(),
-        });
+        this.context.position.symbol1BaseQty = symbol1BaseQty.toString();
+        this.context.position.symbol2BaseQty = symbol2BaseQty.toString();
+        this.context.position.symbol1EntryPrice = symbol1EntryPrice.toString();
+        this.context.position.symbol2EntryPrice = symbol2EntryPrice.toString();
+        await this.context.position.save();
 
         this.context.transitionTo(new PositionStatePending(this.context));
     }
@@ -50,13 +48,12 @@ export class PositionStateClosed extends PositionState
         else
             return;
 
-        await this.context.position.updateOne({
-            side: newPositionSide,
-            symbol1BaseQty: symbol1BaseQty.toString(),
-            symbol2BaseQty: symbol2BaseQty.toString(),
-            symbol1EntryPrice: symbol1EntryPrice.toString(),
-            symbol2EntryPrice: symbol2EntryPrice.toString(),
-        });
+        this.context.position.side = newPositionSide;
+        this.context.position.symbol1BaseQty = symbol1BaseQty.toString();
+        this.context.position.symbol2BaseQty = symbol2BaseQty.toString();
+        this.context.position.symbol1EntryPrice = symbol1EntryPrice.toString();
+        this.context.position.symbol2EntryPrice = symbol2EntryPrice.toString();
+        await this.context.position.save();
 
         this.context.transitionTo(new PositionStatePending(this.context));
     }

@@ -49,11 +49,7 @@ export class OrderStateExecuted extends OrderState
         });
 
         this.context.order.executed = true;
-        this.context.order.save();
-
-        await this.context.order.updateOne({
-            executed: true,
-        });
+        await this.context.order.save();
 
         this.context.emit("executed");
     }
