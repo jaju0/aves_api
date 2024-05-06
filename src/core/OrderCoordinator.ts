@@ -83,7 +83,11 @@ export class OrderCoordinator
         });
 
         for(const dbOrder of dbOrders)
-            this.orderContexts.set(dbOrder.id, new OrderContext(dbOrder, this.restClient, this.wsClient, this.instInfoProvider, this.tickerProvider, this.positionCoordinator));
+        {
+            const orderContext = new OrderContext(dbOrder, this.restClient, this.wsClient, this.instInfoProvider, this.tickerProvider, this.positionCoordinator);
+            orderContext.once("executed", this.orderExecuted.bind(this, dbOrder, orderContext));
+            this.orderContexts.set(dbOrder.id, orderContext);
+        }
     }
 
     private orderExecuted(dbOrder: Order, orderContext: OrderContext)
