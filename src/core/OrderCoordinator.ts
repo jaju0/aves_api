@@ -43,7 +43,7 @@ export class OrderCoordinator
         this.initPromise = this.initialize();
     }
 
-    public createOrder(params: OrderCreationParams)
+    public async createOrder(params: OrderCreationParams)
     {
         const dbOrder = new Order({
             ...params,
@@ -51,11 +51,11 @@ export class OrderCoordinator
             failed: false,
         });
 
-        dbOrder.save();
+        await dbOrder.save();
 
         const orderContext = new OrderContext(dbOrder, this.restClient, this.wsClient, this.instInfoProvider, this.tickerProvider, this.positionCoordinator);
         orderContext.once("executed", this.orderExecuted.bind(this, dbOrder, orderContext));
-        this.orderContexts.set(dbOrder._id.toString(), orderContext);
+        this.orderContexts.set(dbOrder.id, orderContext);
 
         return orderContext;
     }
