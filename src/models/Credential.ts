@@ -39,6 +39,7 @@ credentialSchema.method("activate", async function activate() {
 
 credentialSchema.method("deactivate", async function deactivate() {
     await this.updateOne({ isActive: false });
+    this.isActive = false;
 });
 
 credentialSchema.static("add", async function add(googleId: string, credentials: ICredential[]) {
