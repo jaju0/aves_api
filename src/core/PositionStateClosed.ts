@@ -12,10 +12,10 @@ export class PositionStateClosed extends PositionState
 
         this.context.position.side = "None";
         this.context.position.open = false;
-        this.context.position.symbol1BaseQty  = "";
-        this.context.position.symbol2BaseQty = "";
-        this.context.position.symbol1EntryPrice = "";
-        this.context.position.symbol2EntryPrice = "";
+        this.context.position.symbol1BaseQty  = "0";
+        this.context.position.symbol2BaseQty = "0";
+        this.context.position.symbol1EntryPrice = "0";
+        this.context.position.symbol2EntryPrice = "0";
         this.context.position.save();
     }
 

@@ -72,6 +72,8 @@ export class PositionCoordinator
             open: true,
         });
 
+        await dbPosition.save();
+
         const key = `${dbPosition.symbol1}-${dbPosition.symbol2}`;
         this.positionContexts.set(key, new PositionContext(dbPosition, this.restClient, this.wsClient, this.pnlCalculator));
     }
