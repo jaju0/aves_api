@@ -11,14 +11,14 @@ export interface ICredential
 
 interface CredentialMethods
 {
-    activate(): Promise<void>;
+    activate(googleId: string): Promise<void>;
     deactivate(): Promise<void>;
 }
 
 interface CredentialModel extends Model<ICredential, {}, CredentialMethods>
 {
     add(googleId: string, credentials: ICredential[]): Promise<void | "error">;
-    getActiveCredential(): Promise<Credential | undefined | "error">;
+    getActiveCredential(googleId: string): Promise<Credential | undefined | "error">;
     getCredentialByKey(key: string): Promise<Credential | undefined | "error">;
     getCredentialsByGoogleId(googleId: string): Promise<Credential[] | "error">;
 }
@@ -31,8 +31,8 @@ const credentialSchema = new mongoose.Schema<ICredential, CredentialModel, Crede
     isActive: { type: Boolean, required: true },
 });
 
-credentialSchema.method("activate", async function activate() {
-    await Credential.updateMany(undefined, { isActive: false });
+credentialSchema.method("activate", async function activate(googleId: string) {
+    await Credential.updateMany({ googleId }, { isActive: false });
     await this.updateOne({ isActive: true });
     this.isActive = true;
 });
@@ -66,10 +66,10 @@ credentialSchema.static("add", async function add(googleId: string, credentials:
     }
 });
 
-credentialSchema.static("getActiveCredential", async function getActiveCredential() {
+credentialSchema.static("getActiveCredential", async function getActiveCredential(googleId: string) {
     try
     {
-        const activeCredential = await Credential.findOne({ isActive: true });
+        const activeCredential = await Credential.findOne({ googleId, isActive: true });
         return activeCredential;
     }
     catch(error)

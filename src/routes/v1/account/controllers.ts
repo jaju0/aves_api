@@ -49,14 +49,14 @@ export async function credentialsSubmitionHandler(req: Request<any, any, Credent
         if(credentialToActivate === "error")
             return res.sendStatus(500);
         if(credentialToActivate)
-            await credentialToActivate.activate();
+            await credentialToActivate.activate(req.user.google_id);
     }
 
     const userCredentials = await Credential.getCredentialsByGoogleId(req.user.google_id);
     if(userCredentials === "error")
         return res.sendStatus(500);
 
-    const activeCredential = await Credential.getActiveCredential();
+    const activeCredential = await Credential.getActiveCredential(req.user.google_id);
     if(activeCredential === "error")
         return res.sendStatus(500);
 
@@ -83,7 +83,7 @@ export async function credentialsFetchingHandler(req: Request, res: Response<Cre
     if(userCredentials === "error")
         return res.sendStatus(500);
     
-    const activeCredential = await Credential.getActiveCredential();
+    const activeCredential = await Credential.getActiveCredential(req.user.google_id);
     if(activeCredential === "error")
         return res.sendStatus(500);
 

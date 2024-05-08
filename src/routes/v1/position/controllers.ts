@@ -50,7 +50,7 @@ export async function getPositionListHandler(positionCoordinatorProvider: Positi
     if(req.user === undefined)
         return res.sendStatus(401);
 
-    const activeCredential = await Credential.getActiveCredential();
+    const activeCredential = await Credential.getActiveCredential(req.user.google_id);
     if(activeCredential === "error")
         return res.sendStatus(500);
     else if(activeCredential == undefined)
@@ -73,7 +73,7 @@ export async function liquidationHandler(positionCoordinatorProvider: PositionCo
     if(req.user === undefined)
         return res.sendStatus(401);
 
-    const activeCredential = await Credential.getActiveCredential();
+    const activeCredential = await Credential.getActiveCredential(req.user.google_id);
     if(activeCredential === "error")
         return res.sendStatus(500);
     else if(activeCredential == undefined)
