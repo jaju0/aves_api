@@ -10,8 +10,8 @@ export function positionRouter(positionCoordinatorProvider: PositionCoordinatorP
 
     router.use(passport.initialize());
 
-    router.get("/list", passport.authenticate("jwt", { session: false }), getPositionListHandler.bind(undefined, positionCoordinatorProvider));
-    router.post("/liquidate", schemaValidator("/position/liquidate"), passport.authenticate("jwt", { session: false }), liquidationHandler.bind(undefined, positionCoordinatorProvider));
+    router.get("/list", passport.authenticate("jwt-bearer", { session: false }), getPositionListHandler.bind(undefined, positionCoordinatorProvider));
+    router.post("/liquidate", schemaValidator("/position/liquidate"), passport.authenticate("jwt-bearer", { session: false }), liquidationHandler.bind(undefined, positionCoordinatorProvider));
 
     return router;
 }

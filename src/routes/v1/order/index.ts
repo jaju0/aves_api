@@ -10,9 +10,9 @@ export function orderRouter(orderCoordinatorProvider: OrderCoordinatorProvider)
 
     router.use(passport.initialize());
 
-    router.post("/submit", schemaValidator("/order/submit"), passport.authenticate("jwt", { session: false }), orderSubmitionHandler.bind(undefined, orderCoordinatorProvider));
-    router.post("/amend", schemaValidator("/order/amend"), passport.authenticate("jwt", { session: false }), orderAmendmentHandler.bind(undefined, orderCoordinatorProvider));
-    router.get("/list", passport.authenticate("jwt", { session: false }), orderListHandler.bind(undefined, orderCoordinatorProvider));
+    router.post("/submit", schemaValidator("/order/submit"), passport.authenticate("jwt-bearer", { session: false }), orderSubmitionHandler.bind(undefined, orderCoordinatorProvider));
+    router.post("/amend", schemaValidator("/order/amend"), passport.authenticate("jwt-bearer", { session: false }), orderAmendmentHandler.bind(undefined, orderCoordinatorProvider));
+    router.get("/list", passport.authenticate("jwt-bearer", { session: false }), orderListHandler.bind(undefined, orderCoordinatorProvider));
 
     return router;
 }

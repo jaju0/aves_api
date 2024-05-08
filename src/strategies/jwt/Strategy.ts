@@ -7,10 +7,23 @@ const JSON_WEB_TOKEN_SECRET = process.env.JSON_WEB_TOKEN_SECRET;
 if(JSON_WEB_TOKEN_SECRET === undefined)
     throw new Error("environment variable JSON_WEB_TOKEN_SECRET is undefined");
 
-passport.use(new JwtStrategy({
+passport.use("jwt-bearer", new JwtStrategy({
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
     secretOrKey: JSON_WEB_TOKEN_SECRET,
 }, async (jwtPayload: { google_id: string }, done) => {
+    const foundUser = await User.findOne({
+        google_id: jwtPayload.google_id,
+    });
+
+    done(null, foundUser);
+}));
+
+passport.use("jwt-query", new JwtStrategy({
+    jwtFromRequest: ExtractJwt.fromUrlQueryParameter("token"),
+    secretOrKey: JSON_WEB_TOKEN_SECRET,
+}, async (jwtPayload: { google_id: string }, done) => {
+    console.log("inside jwt-query strategy");
+    console.log(jwtPayload);
     const foundUser = await User.findOne({
         google_id: jwtPayload.google_id,
     });
