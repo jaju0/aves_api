@@ -81,7 +81,7 @@ export async function orderSubmitionHandler(orderCoordinatorProvider: OrderCoord
 
     const data = req.body;
 
-    const activeCredential = await Credential.getActiveCredential(req.user.google_id);
+    const activeCredential = await Credential.getActiveCredential(req.user.id);
     if(activeCredential === "error")
         return res.sendStatus(500);
     else if(activeCredential == undefined)
@@ -115,7 +115,7 @@ export async function orderAmendmentHandler(orderCoordinatorProvider: OrderCoord
 
     const data = req.body;
 
-    const activeCredential = await Credential.getActiveCredential(req.user.google_id);
+    const activeCredential = await Credential.getActiveCredential(req.user.id);
     if(activeCredential === "error")
         return res.sendStatus(500);
     else if(activeCredential == undefined)
@@ -135,7 +135,7 @@ export async function orderListHandler(orderCoordinatorProvider: OrderCoordinato
     if(req.user === undefined)
         return res.sendStatus(401);
 
-    const activeCredential = await Credential.getActiveCredential(req.user.google_id);
+    const activeCredential = await Credential.getActiveCredential(req.user.id);
     if(activeCredential === "error")
         return res.sendStatus(500);
     else if(activeCredential == undefined)

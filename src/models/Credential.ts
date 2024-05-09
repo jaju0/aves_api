@@ -2,7 +2,7 @@ import mongoose, { Model } from "mongoose";
 
 export interface ICredential
 {
-    googleId: string;
+    userId: string;
     key: string;
     secret: string;
     demoTrading: boolean;
@@ -11,28 +11,28 @@ export interface ICredential
 
 interface CredentialMethods
 {
-    activate(googleId: string): Promise<void>;
+    activate(userId: string): Promise<void>;
     deactivate(): Promise<void>;
 }
 
 interface CredentialModel extends Model<ICredential, {}, CredentialMethods>
 {
-    add(googleId: string, credentials: ICredential[]): Promise<void | "error">;
-    getActiveCredential(googleId: string): Promise<Credential | undefined | "error">;
+    add(userId: string, credentials: ICredential[]): Promise<void | "error">;
+    getActiveCredential(userId: string): Promise<Credential | undefined | "error">;
     getCredentialByKey(key: string): Promise<Credential | undefined | "error">;
-    getCredentialsByGoogleId(googleId: string): Promise<Credential[] | "error">;
+    getCredentialsByUserId(userId: string): Promise<Credential[] | "error">;
 }
 
 const credentialSchema = new mongoose.Schema<ICredential, CredentialModel, CredentialMethods>({
-    googleId: { type: String, required: true },
+    userId: { type: String, required: true },
     key: { type: String, required: true },
     secret: { type: String, required: true },
     demoTrading: { type: Boolean, required: true },
     isActive: { type: Boolean, required: true },
 });
 
-credentialSchema.method("activate", async function activate(googleId: string) {
-    await Credential.updateMany({ googleId }, { isActive: false });
+credentialSchema.method("activate", async function activate(userId: string) {
+    await Credential.updateMany({ userId }, { isActive: false });
     await this.updateOne({ isActive: true });
     this.isActive = true;
 });
@@ -42,8 +42,8 @@ credentialSchema.method("deactivate", async function deactivate() {
     this.isActive = false;
 });
 
-credentialSchema.static("add", async function add(googleId: string, credentials: ICredential[]) {
-    const userCredentials = await this.find({ googleId });
+credentialSchema.static("add", async function add(userId: string, credentials: ICredential[]) {
+    const userCredentials = await this.find({ userId });
     const credentialsToInsert = new Array<ICredential>();
     for(const newCredential of credentials)
     {
@@ -66,10 +66,10 @@ credentialSchema.static("add", async function add(googleId: string, credentials:
     }
 });
 
-credentialSchema.static("getActiveCredential", async function getActiveCredential(googleId: string) {
+credentialSchema.static("getActiveCredential", async function getActiveCredential(userId: string) {
     try
     {
-        const activeCredential = await Credential.findOne({ googleId, isActive: true });
+        const activeCredential = await Credential.findOne({ userId, isActive: true });
         return activeCredential;
     }
     catch(error)
@@ -92,10 +92,10 @@ credentialSchema.static("getCredentialByKey", async function getCredentialByKey(
     }
 });
 
-credentialSchema.static("getCredentialsByGoogleId", async function getCredentialsByGoogleId(googleId: string) {
+credentialSchema.static("getCredentialsByUserId", async function getCredentialsByUserId(userId: string) {
     try
     {
-        const credentials = await Credential.find({ googleId });
+        const credentials = await Credential.find({ userId });
         return credentials;
     }
     catch(error)

@@ -12,6 +12,6 @@ export function googleCallbackHandler(req: Request, res: Response<SuccessfulLogi
     if(req.user === undefined)
         return res.sendStatus(401);
 
-    const token = jwt.sign({ google_id: req.user.google_id }, config.JSON_WEB_TOKEN_SECRET, { expiresIn: config.JSON_WEB_TOKEN_EXPIRES_IN });
+    const token = jwt.sign({ user_id: req.user.id }, config.JSON_WEB_TOKEN_SECRET, { expiresIn: config.JSON_WEB_TOKEN_EXPIRES_IN });
     return res.send({ token });
 }

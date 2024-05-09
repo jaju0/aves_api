@@ -1,7 +1,7 @@
 import mongoose, { Model } from "mongoose";
 import { Credential } from "./Credential.js";
 
-export interface IUser
+export interface IUser extends mongoose.Document
 {
     google_id: string;
     email: string;

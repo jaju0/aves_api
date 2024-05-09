@@ -17,16 +17,13 @@ declare global
 }
 
 passport.serializeUser((user, done) => {
-    done(null, user.google_id);
+    done(null, user.id);
 });
 
 passport.deserializeUser<string>(async (id, done) => {
     try
     {
-        const user = await User.findOne({
-            google_id: id,
-        });
-
+        const user = await User.findOne({ id });
         done(null, user);
     }
     catch(error)

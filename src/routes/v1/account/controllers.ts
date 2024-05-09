@@ -23,7 +23,7 @@ export interface CredentialsRequest
 export interface UserDataResponse
 {
     email: string;
-    google_id: string;
+    id: string;
 }
 
 export async function credentialsSubmitionHandler(req: Request<any, any, CredentialsRequest>, res: Response<CredentialsResponse>)
@@ -31,17 +31,17 @@ export async function credentialsSubmitionHandler(req: Request<any, any, Credent
     if(req.user === undefined)
         return res.sendStatus(401);
 
-    const userGoogleId = req.user.google_id;
+    const userId = req.user.id;
 
     const data = req.body;
     const postedCredentials = new Array<ICredential>();
 
     if(data.active_credential)
-        postedCredentials.push({ ...data.active_credential, googleId: req.user.google_id, isActive: false });
+        postedCredentials.push({ ...data.active_credential, userId, isActive: false });
     if(data.credentials)
-        postedCredentials.push(...data.credentials.map((credential: CredentialParams) => ({ ...credential, googleId: userGoogleId, isActive: false })));
+        postedCredentials.push(...data.credentials.map((credential: CredentialParams) => ({ ...credential, userId, isActive: false })));
 
-    await Credential.add(req.user.google_id, postedCredentials);
+    await Credential.add(userId, postedCredentials);
 
     if(data.active_credential)
     {
@@ -49,14 +49,14 @@ export async function credentialsSubmitionHandler(req: Request<any, any, Credent
         if(credentialToActivate === "error")
             return res.sendStatus(500);
         if(credentialToActivate)
-            await credentialToActivate.activate(req.user.google_id);
+            await credentialToActivate.activate(userId);
     }
 
-    const userCredentials = await Credential.getCredentialsByGoogleId(req.user.google_id);
+    const userCredentials = await Credential.getCredentialsByUserId(userId);
     if(userCredentials === "error")
         return res.sendStatus(500);
 
-    const activeCredential = await Credential.getActiveCredential(req.user.google_id);
+    const activeCredential = await Credential.getActiveCredential(userId);
     if(activeCredential === "error")
         return res.sendStatus(500);
 
@@ -79,11 +79,13 @@ export async function credentialsFetchingHandler(req: Request, res: Response<Cre
     if(req.user === undefined)
         return res.sendStatus(401);
 
-    const userCredentials = await Credential.getCredentialsByGoogleId(req.user.google_id);
+    const userId = req.user.id;
+
+    const userCredentials = await Credential.getCredentialsByUserId(userId);
     if(userCredentials === "error")
         return res.sendStatus(500);
     
-    const activeCredential = await Credential.getActiveCredential(req.user.google_id);
+    const activeCredential = await Credential.getActiveCredential(userId);
     if(activeCredential === "error")
         return res.sendStatus(500);
 
@@ -108,6 +110,6 @@ export async function userDataFetchingHandler(req: Request, res: Response<UserDa
 
     return res.json({
         email: req.user.email,
-        google_id: req.user.google_id,
+        id: req.user.id,
     });
 }

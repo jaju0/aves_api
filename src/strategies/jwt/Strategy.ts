@@ -10,9 +10,9 @@ if(JSON_WEB_TOKEN_SECRET === undefined)
 passport.use("jwt-bearer", new JwtStrategy({
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
     secretOrKey: JSON_WEB_TOKEN_SECRET,
-}, async (jwtPayload: { google_id: string }, done) => {
+}, async (jwtPayload: { user_id: string }, done) => {
     const foundUser = await User.findOne({
-        google_id: jwtPayload.google_id,
+        id: jwtPayload.user_id,
     });
 
     done(null, foundUser);
@@ -21,11 +21,11 @@ passport.use("jwt-bearer", new JwtStrategy({
 passport.use("jwt-query", new JwtStrategy({
     jwtFromRequest: ExtractJwt.fromUrlQueryParameter("token"),
     secretOrKey: JSON_WEB_TOKEN_SECRET,
-}, async (jwtPayload: { google_id: string }, done) => {
+}, async (jwtPayload: { user_id: string }, done) => {
     console.log("inside jwt-query strategy");
     console.log(jwtPayload);
     const foundUser = await User.findOne({
-        google_id: jwtPayload.google_id,
+        id: jwtPayload.user_id,
     });
 
     done(null, foundUser);
