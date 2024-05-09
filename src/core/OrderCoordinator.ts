@@ -7,6 +7,7 @@ import { PositionCoordinator } from "./PositionCoordinator.js";
 
 export interface OrderCreationParams
 {
+    ownerId: string;
     type: OrderType;
     side: OrderSide;
     symbol1: string;

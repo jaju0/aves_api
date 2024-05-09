@@ -8,6 +8,7 @@ export type OrderSide = typeof orderSide[number];
 
 export interface IOrder extends mongoose.Document
 {
+    ownerId: string;
     type: OrderType;
     side: OrderSide;
     symbol1: string;
@@ -26,6 +27,7 @@ export interface IOrder extends mongoose.Document
 type OrderModel = Model<IOrder>;
 
 const orderSchema = new mongoose.Schema<IOrder, OrderModel>({
+    ownerId: { type: String, required: true },
     type: { type: String, required: true },
     side: { type: String, required: true },
     symbol1: { type: String, required: true },

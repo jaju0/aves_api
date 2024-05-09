@@ -90,6 +90,7 @@ export async function orderSubmitionHandler(orderCoordinatorProvider: OrderCoord
     const orderCoordinator = orderCoordinatorProvider.get(activeCredential.key, activeCredential.secret, activeCredential.demoTrading);
 
     const orderContext = await orderCoordinator.createOrder({
+        ownerId: req.user.id,
         type: req.body.type,
         side: req.body.side,
         symbol1: req.body.symbol1,
