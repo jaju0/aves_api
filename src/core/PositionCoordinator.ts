@@ -6,6 +6,7 @@ import { Position, PositionSide } from "../models/Position.js";
 
 export interface AddToPositionParams
 {
+    ownerId: string;
     side: PositionSide;
     symbol1: string;
     symbol2: string;
@@ -45,7 +46,7 @@ export class PositionCoordinator
         const symbol1EntryPrice = new Decimal(params.symbol1EntryPrice);
         const symbol2EntryPrice = new Decimal(params.symbol2EntryPrice);
 
-        const contextKey = `${params.symbol1}-${params.symbol2}`;
+        const contextKey = `${params.ownerId}-${params.symbol1}-${params.symbol2}`;
         let context = this.positionContexts.get(contextKey);
         if(context !== undefined)
         {
@@ -74,7 +75,7 @@ export class PositionCoordinator
 
         await dbPosition.save();
 
-        const key = `${dbPosition.symbol1}-${dbPosition.symbol2}`;
+        const key = `${params.ownerId}-${dbPosition.symbol1}-${dbPosition.symbol2}`;
         this.positionContexts.set(key, new PositionContext(dbPosition, this.restClient, this.wsClient, this.pnlCalculator));
     }
 
@@ -101,7 +102,7 @@ export class PositionCoordinator
 
         for(const dbPosition of dbPositions)
         {
-            const key = `${dbPosition.symbol1}-${dbPosition.symbol2}`;
+            const key = `${dbPosition.ownerId}-${dbPosition.symbol1}-${dbPosition.symbol2}`;
             this.positionContexts.set(key, new PositionContext(dbPosition, this.restClient, this.wsClient, this.pnlCalculator));
         }
     }

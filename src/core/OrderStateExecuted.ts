@@ -38,6 +38,7 @@ export class OrderStateExecuted extends OrderState
         const symbol2FilledPrice = symbol2OrderData.avgPrice === "" || symbol2OrderData.avgPrice === "0" ? symbol2OrderData.price : symbol2OrderData.avgPrice;
 
         await this.context.positionCoordinator.submitToPosition({
+            ownerId: this.context.order.ownerId,
             side: this.context.order.side === "Buy" ? "Long" : "Short",
             symbol1: this.context.order.symbol1,
             symbol2: this.context.order.symbol2,
@@ -48,7 +49,7 @@ export class OrderStateExecuted extends OrderState
             symbol2EntryPrice: symbol2FilledPrice,
         });
 
-        this.context.order.executed = true;
+        this.context.order.status = "Executed";
         await this.context.order.save();
 
         this.context.emit("executed");

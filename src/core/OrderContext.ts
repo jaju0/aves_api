@@ -39,7 +39,7 @@ export class OrderContext extends EventEmitter<{
         this.tickerProvider = tickerProvider;
         this.positionCoordinator = positionCoordinator;
 
-        if(this.order.executed)
+        if(this.order.status === "Executed")
         {
             this.transitionTo(new OrderStateExecuted(this));
             return;

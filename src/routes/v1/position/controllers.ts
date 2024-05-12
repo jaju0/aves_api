@@ -81,7 +81,7 @@ export async function liquidationHandler(positionCoordinatorProvider: PositionCo
 
     const data = req.body;
 
-    const pair = `${data.symbol1}-${data.symbol2}`;
+    const pair = `${req.user.id}-${data.symbol1}-${data.symbol2}`;
     const positionCoordinator = positionCoordinatorProvider.get(activeCredential.key, activeCredential.secret, activeCredential.demoTrading);
     const context = positionCoordinator.PositionContexts.get(pair);
     if(context === undefined)

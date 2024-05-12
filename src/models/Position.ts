@@ -4,6 +4,7 @@ export type PositionSide = "None" | "Long" | "Short";
 
 export interface IPosition extends mongoose.Document
 {
+    ownerId: string;
     side: PositionSide;
     symbol1: string;
     symbol2: string;
@@ -20,6 +21,7 @@ export interface IPosition extends mongoose.Document
 type PositionModel = Model<IPosition>;
 
 const positionSchema = new mongoose.Schema<IPosition, PositionModel>({
+    ownerId: { type: String, required: true },
     side: { type: String, required: true },
     symbol1: { type: String, required: true },
     symbol2: { type: String, required: true },

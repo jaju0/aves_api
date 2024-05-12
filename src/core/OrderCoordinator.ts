@@ -48,8 +48,7 @@ export class OrderCoordinator
     {
         const dbOrder = new Order({
             ...params,
-            executed: false,
-            failed: false,
+            status: "New",
         });
 
         await dbOrder.save();
@@ -79,8 +78,7 @@ export class OrderCoordinator
     private async initialize()
     {
         const dbOrders = await Order.find({
-            executed: { $eq: false },
-            failed: { $eq: false },
+            status: { $in: ["New", "Pending"] },
         });
 
         for(const dbOrder of dbOrders)

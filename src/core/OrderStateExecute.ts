@@ -14,7 +14,7 @@ export class OrderStateExecute extends OrderState
 
     public async initialize()
     {
-        if(this.context.order.executed)
+        if(this.context.order.status === "Executed")
         {
             await this.context.transitionTo(new OrderStateExecuted(this.context));
             return;
@@ -82,6 +82,7 @@ export class OrderStateExecute extends OrderState
         this.context.symbol1OrderId = symbol1SubmitionResponse.result.orderId;
         this.context.symbol2OrderId = symbol2SubmitionResponse.result.orderId;
 
+        this.context.order.status = "Execute";
         this.context.order.symbol1BaseQty = roundedContractSizes.symbol1ContractSize.toString();
         this.context.order.symbol2BaseQty = roundedContractSizes.symbol2ContractSize.toString();
         this.context.order.entryResidual = this.context.residualFeed?.CurrentResidual?.toString();

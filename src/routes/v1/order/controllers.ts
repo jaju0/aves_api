@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { Order, OrderSide, OrderType } from "../../../models/Order.js";
+import { Order, OrderSide, OrderStatus, OrderType } from "../../../models/Order.js";
 import { Credential } from "../../../models/Credential.js";
 import { OrderCoordinatorProvider } from "../../../core/OrderCoordinatorProvider.js";
 
@@ -12,6 +12,7 @@ export interface BaseQty
 export interface OrderData
 {
     orderId: string;
+    status: OrderStatus;
     type: OrderType;
     side: OrderSide;
     symbol1: string;
@@ -23,8 +24,6 @@ export interface OrderData
     regressionSlope: string;
     takeProfit?: string;
     stopLoss?: string;
-    executed: boolean;
-    failed: boolean;
 }
 
 export interface OrderSubmitionRequest
@@ -58,6 +57,7 @@ function orderDocumentToResponseData(order: Order)
 {
     return <OrderData> {
         orderId: order.id,
+        status: order.status,
         type: order.type,
         side: order.side,
         symbol1: order.symbol1,
@@ -69,8 +69,6 @@ function orderDocumentToResponseData(order: Order)
         regressionSlope: order.regressionSlope,
         takeProfit: order.takeProfit,
         stopLoss: order.stopLoss,
-        executed: order.executed,
-        failed: order.failed,
     };
 }
 

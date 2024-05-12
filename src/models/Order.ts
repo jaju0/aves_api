@@ -6,9 +6,13 @@ export type OrderType = typeof orderType[number];
 export const orderSide = ["Buy", "Sell"] as const;
 export type OrderSide = typeof orderSide[number];
 
+export const orderStatus = ["New", "Pending", "Execute", "Executed", "Failed"] as const;
+export type OrderStatus = typeof orderStatus[number];
+
 export interface IOrder extends mongoose.Document
 {
     ownerId: string;
+    status: OrderStatus;
     type: OrderType;
     side: OrderSide;
     symbol1: string;
@@ -20,14 +24,13 @@ export interface IOrder extends mongoose.Document
     regressionSlope: string;
     takeProfit?: string;
     stopLoss?: string;
-    executed: boolean;
-    failed: boolean;
 }
 
 type OrderModel = Model<IOrder>;
 
 const orderSchema = new mongoose.Schema<IOrder, OrderModel>({
     ownerId: { type: String, required: true },
+    status: { type: String, required: true, default: "New" },
     type: { type: String, required: true },
     side: { type: String, required: true },
     symbol1: { type: String, required: true },
