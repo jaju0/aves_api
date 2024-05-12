@@ -11,10 +11,7 @@ passport.use("jwt-bearer", new JwtStrategy({
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
     secretOrKey: JSON_WEB_TOKEN_SECRET,
 }, async (jwtPayload: { user_id: string }, done) => {
-    const foundUser = await User.findOne({
-        id: jwtPayload.user_id,
-    });
-
+    const foundUser = await User.findById(jwtPayload.user_id);
     done(null, foundUser);
 }));
 
@@ -22,11 +19,6 @@ passport.use("jwt-query", new JwtStrategy({
     jwtFromRequest: ExtractJwt.fromUrlQueryParameter("token"),
     secretOrKey: JSON_WEB_TOKEN_SECRET,
 }, async (jwtPayload: { user_id: string }, done) => {
-    console.log("inside jwt-query strategy");
-    console.log(jwtPayload);
-    const foundUser = await User.findOne({
-        id: jwtPayload.user_id,
-    });
-
+    const foundUser = await User.findById(jwtPayload.user_id);
     done(null, foundUser);
 }));
