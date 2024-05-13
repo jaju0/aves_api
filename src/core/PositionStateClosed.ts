@@ -21,9 +21,14 @@ export class PositionStateClosed extends PositionState
 
     public async initialize()
     {
+        await this.context.shutdown();
     }
 
     public async residualUpdate(residual: Decimal)
+    {
+    }
+
+    public async pnlUpdate(pnl: Decimal)
     {
     }
 

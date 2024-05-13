@@ -3,6 +3,8 @@ import { PositionContext } from "./PositionContext.js";
 import { PositionState } from "./PositionState.js";
 import { PositionStateClosed } from "./PositionStateClosed.js";
 import { ResidualFeed } from "./ResidualFeed.js";
+import { TickerFeed } from "./TickerFeed.js";
+import { PnlFeed } from "./PnlFeed.js";
 
 export class PositionStatePending extends PositionState
 {
@@ -21,6 +23,18 @@ export class PositionStatePending extends PositionState
 
             this.context.residualFeed.on("update", this.context.residualUpdate.bind(this.context));
         }
+
+        if(!this.context.symbol1TickerFeed)
+            this.context.symbol1TickerFeed = new TickerFeed(this.context.position.symbol1, this.context.wsClient);
+        
+        if(!this.context.symbol2TickerFeed)
+            this.context.symbol2TickerFeed = new TickerFeed(this.context.position.symbol2, this.context.wsClient);
+
+        if(!this.context.pnlFeed)
+        {
+            this.context.pnlFeed = new PnlFeed(this.context.position, this.context.symbol1TickerFeed, this.context.symbol2TickerFeed);
+            this.context.pnlFeed.on("update", this.context.pnlUpdate.bind(this.context));
+        }
     }
 
     public async initialize()
@@ -29,8 +43,6 @@ export class PositionStatePending extends PositionState
 
     public async residualUpdate(residual: Decimal)
     {
-        this.context.pnl = (await this.context.pnlCalculator.get(this.context.position)) ?? this.context.pnl;
-
         let entryResidual: Decimal;
         {
             // y = mx+e
@@ -88,6 +100,11 @@ export class PositionStatePending extends PositionState
         this.context.position.symbol2BaseQty = newSymbol2BaseQty.toString();
         this.context.position.symbol2EntryPrice = newSymbol2EntryPrice.toString();
         await this.context.position.save();
+    }
+
+    public async pnlUpdate(pnl: Decimal)
+    {
+        // TODO: save pnl update in database (maybe not on every call here; restrain it to a specific interval)
     }
 
     public async remove(symbol1BaseQty: Decimal, symbol1EntryPrice: Decimal, symbol2BaseQty: Decimal, symbol2EntryPrice: Decimal)

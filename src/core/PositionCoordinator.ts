@@ -1,6 +1,5 @@
 import { RestClientV5, WebsocketClient } from "bybit-api";
 import Decimal from "decimal.js";
-import { PnlCalculator } from "./PnlCalculator.js";
 import { PositionContext } from "./PositionContext.js";
 import { Position, PositionSide } from "../models/Position.js";
 
@@ -26,14 +25,12 @@ export class PositionCoordinator
 
     private restClient: RestClientV5;
     private wsClient: WebsocketClient;
-    private pnlCalculator: PnlCalculator;
 
-    constructor(restClient: RestClientV5, wsClient: WebsocketClient, pnlCalculator: PnlCalculator)
+    constructor(restClient: RestClientV5, wsClient: WebsocketClient)
     {
         this.positionContexts = new Map();
         this.restClient = restClient;
         this.wsClient = wsClient;
-        this.pnlCalculator = pnlCalculator;
 
         this.initPromise = this.initialize();
     }
@@ -76,7 +73,7 @@ export class PositionCoordinator
         await dbPosition.save();
 
         const key = `${params.ownerId}-${dbPosition.symbol1}-${dbPosition.symbol2}`;
-        this.positionContexts.set(key, new PositionContext(dbPosition, this.restClient, this.wsClient, this.pnlCalculator));
+        this.positionContexts.set(key, new PositionContext(dbPosition, this.restClient, this.wsClient));
     }
 
     public async liquidateAll()
@@ -103,7 +100,7 @@ export class PositionCoordinator
         for(const dbPosition of dbPositions)
         {
             const key = `${dbPosition.ownerId}-${dbPosition.symbol1}-${dbPosition.symbol2}`;
-            this.positionContexts.set(key, new PositionContext(dbPosition, this.restClient, this.wsClient, this.pnlCalculator));
+            this.positionContexts.set(key, new PositionContext(dbPosition, this.restClient, this.wsClient));
         }
     }
 }

@@ -1,21 +1,18 @@
 import { WebsocketClient } from "bybit-api";
 import { BybitRestClientProvider } from "./BybitRestClientProvider.js";
 import { PositionCoordinator } from "./PositionCoordinator.js";
-import { PnlCalculator } from "./PnlCalculator.js";
 
 export class PositionCoordinatorProvider
 {
     private bybitRestClientProvider: BybitRestClientProvider;
     private wsClient: WebsocketClient;
-    private pnlCalculator: PnlCalculator;
 
     private positionCoordinators: Map<string, PositionCoordinator>;
 
-    constructor(bybitRestClientProvider: BybitRestClientProvider, wsClient: WebsocketClient, pnlCalculator: PnlCalculator)
+    constructor(bybitRestClientProvider: BybitRestClientProvider, wsClient: WebsocketClient)
     {
         this.bybitRestClientProvider = bybitRestClientProvider;
         this.wsClient = wsClient;
-        this.pnlCalculator = pnlCalculator;
         this.positionCoordinators = new Map();
     }
 
@@ -25,7 +22,7 @@ export class PositionCoordinatorProvider
         if(foundPositionCoordinator === undefined)
         {
             const restClient = this.bybitRestClientProvider.get(apiKey, apiSecret, demoTrading);
-            foundPositionCoordinator = new PositionCoordinator(restClient, this.wsClient, this.pnlCalculator);
+            foundPositionCoordinator = new PositionCoordinator(restClient, this.wsClient);
             this.positionCoordinators.set(apiKey, foundPositionCoordinator);
         }
 
