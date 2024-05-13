@@ -1,4 +1,6 @@
 import mongoose, { Model } from "mongoose";
+import PubSub from "pubsub-js";
+import { orderModelToEventData } from "../utils/events.js";
 
 export const orderType = ["Market", "Limit", "Stop"] as const;
 export type OrderType = typeof orderType[number];
@@ -42,8 +44,10 @@ const orderSchema = new mongoose.Schema<IOrder, OrderModel>({
     regressionSlope: { type: String, required: true },
     takeProfit: { type: String, required: false },
     stopLoss: { type: String, required: false },
-    executed: { type: Boolean, required: true, default: false },
-    failed: { type: Boolean, required: true, default: false },
+});
+
+orderSchema.post("save", doc => {
+    PubSub.publish(`order.${doc.ownerId}`, orderModelToEventData(doc));
 });
 
 export const Order = mongoose.model("Order", orderSchema);

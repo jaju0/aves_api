@@ -1,4 +1,6 @@
 import mongoose, { Model } from "mongoose";
+import PubSub from "pubsub-js";
+import { positionModelToEventData } from "../utils/events.js";
 
 export type PositionSide = "None" | "Long" | "Short";
 
@@ -35,6 +37,10 @@ const positionSchema = new mongoose.Schema<IPosition, PositionModel>({
     takeProfit: { type: String, required: false },
     stopLoss: { type: String, required: false },
     open: { type: Boolean, required: true, default: true },
+});
+
+positionSchema.post("save", doc => {
+    PubSub.publish(`position.${doc.ownerId}`, positionModelToEventData(doc));
 });
 
 export const Position = mongoose.model("Position", positionSchema);
