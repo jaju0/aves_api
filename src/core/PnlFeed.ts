@@ -22,25 +22,25 @@ export class PnlFeed extends EventEmitter<{
         this.symbol1TickerFeed = symbol1TickerFeed;
         this.symbol2TickerFeed = symbol2TickerFeed;
         
-        this.symbol1TickerFeed.on("update", this.onTickerUpdate.bind(this));
-        this.symbol2TickerFeed.on("update", this.onTickerUpdate.bind(this));
+        this.symbol1TickerFeed.on("update", this.onSymbol1TickerUpdate.bind(this));
+        this.symbol2TickerFeed.on("update", this.onSymbol2TickerUpdate.bind(this));
     }
 
     public shutdown()
     {
-        this.symbol1TickerFeed.off("update", this.onTickerUpdate.bind(this));
-        this.symbol2TickerFeed.off("update", this.onTickerUpdate.bind(this));
+        this.symbol1TickerFeed.off("update", this.onSymbol1TickerUpdate.bind(this));
+        this.symbol2TickerFeed.off("update", this.onSymbol2TickerUpdate.bind(this));
     }
 
     private async onSymbol1TickerUpdate(ticker: TickerLinearInverseV5)
     {
-        this.symbol1Pnl = await this.calculatePnl(ticker, this.position.symbol1, new Decimal(this.position.symbol1EntryPrice), new Decimal(this.position.symbol1BaseQty), this.position.side);
+        this.symbol1Pnl = await this.calculatePnl(ticker, new Decimal(this.position.symbol1EntryPrice), new Decimal(this.position.symbol1BaseQty), this.position.side);
         return await this.onTickerUpdate();
     }
 
     private async onSymbol2TickerUpdate(ticker: TickerLinearInverseV5)
     {
-        this.symbol2Pnl = await this.calculatePnl(ticker, this.position.symbol2, new Decimal(this.position.symbol2EntryPrice), new Decimal(this.position.symbol2BaseQty), this.position.side === "Long" ? "Short" : "Long");
+        this.symbol2Pnl = await this.calculatePnl(ticker, new Decimal(this.position.symbol2EntryPrice), new Decimal(this.position.symbol2BaseQty), this.position.side === "Long" ? "Short" : "Long");
         return await this.onTickerUpdate();
     }
 
@@ -54,7 +54,7 @@ export class PnlFeed extends EventEmitter<{
         this.emit("update", totalPnl);
     }
 
-    private async calculatePnl(ticker: TickerLinearInverseV5, symbol: string, entryPrice: Decimal, qty: Decimal, positionSide: PositionSide)
+    private async calculatePnl(ticker: TickerLinearInverseV5, entryPrice: Decimal, qty: Decimal, positionSide: PositionSide)
     {
         const lastTradedPrice = new Decimal(ticker.lastPrice);
 
