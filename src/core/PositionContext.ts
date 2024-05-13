@@ -1,3 +1,4 @@
+import EventEmitter from "events";
 import { RestClientV5, WebsocketClient } from "bybit-api";
 import Decimal from "decimal.js";
 import { Position } from "../models/Position.js";
@@ -8,7 +9,9 @@ import { ResidualFeed } from "./ResidualFeed.js";
 import { PnlFeed } from "./PnlFeed.js";
 import { TickerFeed } from "./TickerFeed.js";
 
-export class PositionContext
+export class PositionContext extends EventEmitter<{
+    "closed": [],
+}>
 {
     public readonly position: Position;
     public readonly restClient: RestClientV5;
@@ -24,6 +27,7 @@ export class PositionContext
 
     constructor(position: Position, restClient: RestClientV5, wsClient: WebsocketClient)
     {
+        super();
         this.position = position;
         this.restClient = restClient;
         this.wsClient = wsClient;

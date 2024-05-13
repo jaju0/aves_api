@@ -73,7 +73,9 @@ export class PositionCoordinator
         await dbPosition.save();
 
         const key = `${params.ownerId}-${dbPosition.symbol1}-${dbPosition.symbol2}`;
-        this.positionContexts.set(key, new PositionContext(dbPosition, this.restClient, this.wsClient));
+        const positionContext = new PositionContext(dbPosition, this.restClient, this.wsClient);
+        this.positionContexts.set(key, positionContext);
+        positionContext.once("closed", this.positionExecuted.bind(this, params.ownerId, dbPosition, positionContext));
     }
 
     public async liquidateAll()
@@ -102,5 +104,12 @@ export class PositionCoordinator
             const key = `${dbPosition.ownerId}-${dbPosition.symbol1}-${dbPosition.symbol2}`;
             this.positionContexts.set(key, new PositionContext(dbPosition, this.restClient, this.wsClient));
         }
+    }
+
+    private positionExecuted(ownerId: string, dbPosition: Position, positionContext: PositionContext)
+    {
+        const key = `${ownerId}-${dbPosition.symbol1}-${dbPosition.symbol2}`;
+        positionContext.shutdown();
+        this.positionContexts.delete(key);
     }
 }

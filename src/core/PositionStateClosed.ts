@@ -10,18 +10,14 @@ export class PositionStateClosed extends PositionState
     {
         super(context);
 
-        this.context.position.side = "None";
         this.context.position.open = false;
-        this.context.position.symbol1BaseQty  = "0";
-        this.context.position.symbol2BaseQty = "0";
-        this.context.position.symbol1EntryPrice = "0";
-        this.context.position.symbol2EntryPrice = "0";
         this.context.position.save();
     }
 
     public async initialize()
     {
         await this.context.shutdown();
+        this.context.emit("closed");
     }
 
     public async residualUpdate(residual: Decimal)
@@ -34,33 +30,10 @@ export class PositionStateClosed extends PositionState
 
     public async add(symbol1BaseQty: Decimal, symbol1EntryPrice: Decimal, symbol2BaseQty: Decimal, symbol2EntryPrice: Decimal)
     {
-        this.context.position.symbol1BaseQty = symbol1BaseQty.toString();
-        this.context.position.symbol2BaseQty = symbol2BaseQty.toString();
-        this.context.position.symbol1EntryPrice = symbol1EntryPrice.toString();
-        this.context.position.symbol2EntryPrice = symbol2EntryPrice.toString();
-        await this.context.position.save();
-
-        this.context.transitionTo(new PositionStatePending(this.context));
     }
 
     public async remove(symbol1BaseQty: Decimal, symbol1EntryPrice: Decimal, symbol2BaseQty: Decimal, symbol2EntryPrice: Decimal)
     {
-        let newPositionSide: PositionSide;
-        if(this.context.position.side === "Long")
-            newPositionSide = "Short";
-        else if(this.context.position.side === "Short")
-            newPositionSide = "Long";
-        else
-            return;
-
-        this.context.position.side = newPositionSide;
-        this.context.position.symbol1BaseQty = symbol1BaseQty.toString();
-        this.context.position.symbol2BaseQty = symbol2BaseQty.toString();
-        this.context.position.symbol1EntryPrice = symbol1EntryPrice.toString();
-        this.context.position.symbol2EntryPrice = symbol2EntryPrice.toString();
-        await this.context.position.save();
-
-        this.context.transitionTo(new PositionStatePending(this.context));
     }
 
     public async liquidate()
