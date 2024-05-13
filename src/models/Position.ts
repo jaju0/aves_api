@@ -12,6 +12,7 @@ export interface IPosition extends mongoose.Document
     symbol2EntryPrice: string;
     symbol1BaseQty: string;
     symbol2BaseQty: string;
+    lastPnl: string;
     regressionSlope: string;
     takeProfit?: string;
     stopLoss?: string;
@@ -29,6 +30,7 @@ const positionSchema = new mongoose.Schema<IPosition, PositionModel>({
     symbol2EntryPrice: { type: String, required: true },
     symbol1BaseQty: { type: String, required: true },
     symbol2BaseQty: { type: String, required: true },
+    lastPnl: { type: String, required: true, default: "0" },
     regressionSlope: { type: String, required: true },
     takeProfit: { type: String, required: false },
     stopLoss: { type: String, required: false },

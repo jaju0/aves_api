@@ -1,4 +1,5 @@
 import Decimal from "decimal.js";
+import config from "../config.js";
 import { PositionContext } from "./PositionContext.js";
 import { PositionState } from "./PositionState.js";
 import { PositionStateClosed } from "./PositionStateClosed.js";
@@ -8,9 +9,12 @@ import { PnlFeed } from "./PnlFeed.js";
 
 export class PositionStatePending extends PositionState
 {
+    private lastPnlUpdateTimestamp: number;
+
     constructor(context: PositionContext)
     {
         super(context);
+        this.lastPnlUpdateTimestamp = 0;
 
         if(!this.context.residualFeed)
         {
@@ -104,7 +108,16 @@ export class PositionStatePending extends PositionState
 
     public async pnlUpdate(pnl: Decimal)
     {
-        // TODO: save pnl update in database (maybe not on every call here; restrain it to a specific interval)
+        if(pnl.eq(this.context.position.lastPnl))
+            return;
+
+        this.context.position.lastPnl = pnl.toString();
+        const now = Date.now();
+        const currentPnlUpdateTimestamp = now - now % config.POSITION_PNL_UPDATE_INTERVAL_MS;
+        if(currentPnlUpdateTimestamp > this.lastPnlUpdateTimestamp)
+            this.context.position.save();
+
+        this.lastPnlUpdateTimestamp = currentPnlUpdateTimestamp;
     }
 
     public async remove(symbol1BaseQty: Decimal, symbol1EntryPrice: Decimal, symbol2BaseQty: Decimal, symbol2EntryPrice: Decimal)

@@ -21,8 +21,6 @@ export class PositionContext extends EventEmitter<{
     public symbol2TickerFeed?: TickerFeed;
     public pnlFeed?: PnlFeed;
 
-    public pnl: Decimal;
-
     private state: PositionState;
 
     constructor(position: Position, restClient: RestClientV5, wsClient: WebsocketClient)
@@ -31,8 +29,6 @@ export class PositionContext extends EventEmitter<{
         this.position = position;
         this.restClient = restClient;
         this.wsClient = wsClient;
-
-        this.pnl = new Decimal(0);
 
         if(this.position.open)
             this.state = new PositionStatePending(this);

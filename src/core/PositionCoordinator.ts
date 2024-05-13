@@ -67,6 +67,7 @@ export class PositionCoordinator
 
         const dbPosition = new Position({
             ...params,
+            lastPnl: "0",
             open: true,
         });
 
