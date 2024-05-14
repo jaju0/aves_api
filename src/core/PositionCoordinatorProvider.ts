@@ -1,6 +1,8 @@
 import { WebsocketClient } from "bybit-api";
 import { BybitRestClientProvider } from "./BybitRestClientProvider.js";
 import { PositionCoordinator } from "./PositionCoordinator.js";
+import { Position } from "../models/Position.js";
+import { Credential } from "../models/Credential.js";
 
 export class PositionCoordinatorProvider
 {
@@ -29,5 +31,24 @@ export class PositionCoordinatorProvider
         return foundPositionCoordinator;
     }
 
-    // TODO: implement a function to load existing positions for startup
+    public async initialize()
+    {
+        const userIds = await Position.find({ open: true }).select(["ownerId"]);
+
+        const credentials = await Credential.find({
+            userId: { $in: userIds },
+            isActive: true,
+        });
+
+        for(const credential of credentials)
+        {
+            let foundPositionCoordinator = this.positionCoordinators.get(credential.key);
+            if(foundPositionCoordinator === undefined)
+            {
+                const restClient = this.bybitRestClientProvider.get(credential.key, credential.secret, credential.demoTrading);
+                foundPositionCoordinator = new PositionCoordinator(restClient, this.wsClient);
+                this.positionCoordinators.set(credential.key, foundPositionCoordinator);
+            }
+        }
+    }
 }

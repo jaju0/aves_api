@@ -98,7 +98,7 @@ export class PositionCoordinator
 
     private async initialize()
     {
-        const dbPositions = await Position.find();
+        const dbPositions = await Position.find({ open: true });
 
         for(const dbPosition of dbPositions)
         {

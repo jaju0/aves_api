@@ -4,6 +4,8 @@ import { OrderCoordinator } from "./OrderCoordinator.js";
 import { InstrumentsInfoProvider } from "./InstrumentsInfoProvider.js";
 import { TickerProvider } from "./TickerProvider.js";
 import { PositionCoordinatorProvider } from "core/PositionCoordinatorProvider.js";
+import { Order } from "../models/Order.js";
+import { Credential } from "../models/Credential.js";
 
 export class OrderCoordinatorProvider
 {
@@ -39,6 +41,27 @@ export class OrderCoordinatorProvider
         return foundOrderCoordinator;
     }
 
+    public async initialize()
+    {
+        const userIds = await Order.find({
+            status: { $in: ["New", "Pending"] },
+        }).select(["ownerId"]);
 
-    // TODO: implement a function to load existing orders for startup
+        const credentials = await Credential.find({
+            userId: { $in: userIds },
+            isActive: true,
+        });
+
+        for(const credential of credentials)
+        {
+            let foundOrderCoordinator = this.orderCoordinators.get(credential.key);
+            if(foundOrderCoordinator === undefined)
+            {
+                const restClient = this.bybitRestClientProvider.get(credential.key, credential.secret, credential.demoTrading);
+                const positionCoordinator = this.positionCoordinatorProvider.get(credential.key, credential.secret, credential.demoTrading);
+                foundOrderCoordinator = new OrderCoordinator(restClient, this.wsClient, this.instInfoProvider, this.tickerProvider, positionCoordinator);
+                this.orderCoordinators.set(credential.key, foundOrderCoordinator);
+            }
+        }
+    }
 }
