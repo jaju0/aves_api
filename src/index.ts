@@ -47,7 +47,7 @@ async function main()
     const orderCoordinatorProvider = new OrderCoordinatorProvider(bybitRestClientProvider, bybitWsClient, instInfoProvider, tickerProivder, positionCoordinatorProvider);
     const websocketAgentProvider = new WebsocketAgentProvider();
 
-    await mongoose.connect("mongodb://mongodb:27017/aves", {
+    await mongoose.connect(`mongodb://mongodb:${config.MONGODB_PORT}/${config.MONGODB_DB_NAME}`, {
         user: config.MONGOOSE_USER,
         pass: config.MONGOOSE_PASS,
     });
