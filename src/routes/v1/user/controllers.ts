@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { Credential } from "../../../models/Credential";
+import { Credential } from "../../../models/Credential.js";
 import { IUser, User, UserRank } from "../../../models/User.js";
 
 export interface UserCreationRequest
