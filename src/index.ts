@@ -4,6 +4,7 @@ import session from "express-session";
 import mongoose from "mongoose";
 import { RestClientV5, WebsocketClient } from "bybit-api";
 import expressWs from "express-ws";
+import { User } from "./models/User.js";
 import { OrderCoordinatorProvider } from "./core/OrderCoordinatorProvider.js";
 import { BybitRestClientProvider } from "./core/BybitRestClientProvider.js";
 import { InstrumentsInfoProvider } from "./core/InstrumentsInfoProvider.js";
@@ -14,6 +15,20 @@ import { v1Router } from "./routes/v1/index.js";
 import config from "./config.js";
 import "./strategies/google_oauth/Strategy.js";
 import "./strategies/jwt/Strategy.js";
+
+async function initializeAdminUser()
+{
+    const adminUserEmailCount = await User.countDocuments({ email: config.INITIAL_ADMIN_EMAIL_ADDRESS });
+    if(adminUserEmailCount)
+        return;
+
+    const adminUser = new User({
+        email: config.INITIAL_ADMIN_EMAIL_ADDRESS,
+        credentials: [],
+    });
+
+    await adminUser.save();
+}
 
 async function main()
 {
@@ -36,6 +51,8 @@ async function main()
         user: config.MONGOOSE_USER,
         pass: config.MONGOOSE_PASS,
     });
+
+    await initializeAdminUser();
 
     await orderCoordinatorProvider.initialize();
     await positionCoordinatorProvider.initialize();
