@@ -36,6 +36,7 @@ userSchema.static("add", async function add(email: string, rank: UserRank) {
 
     const newUser = new User({
         email,
+        user_rank: rank,
         credentials: [],
     });
 

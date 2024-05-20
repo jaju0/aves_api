@@ -25,6 +25,7 @@ async function initializeAdminUser()
     const adminUser = new User({
         email: config.INITIAL_ADMIN_EMAIL_ADDRESS,
         credentials: [],
+        user_rank: "ADMIN",
     });
 
     await adminUser.save();
