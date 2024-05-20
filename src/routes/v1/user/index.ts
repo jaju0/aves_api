@@ -9,9 +9,9 @@ export function userRouter()
 
     router.use(passport.initialize());
 
-    router.post("/create", schemaValidator("/user/create"), passport.authenticate("jwt-bearer", { session: false }), createUserHandler);
-    router.put("/amend", schemaValidator("/user/amend"), passport.authenticate("jwt-bearer", { session: false }), amendUserHandler);
-    router.get("/list", passport.authenticate("jwt-bearer", { session: false }), getUserListHandler);
+    router.post("/create", schemaValidator("/user/create"), createUserHandler);
+    router.put("/amend", schemaValidator("/user/amend"), amendUserHandler);
+    router.get("/list", getUserListHandler);
 
     return router;
 }

@@ -1,4 +1,5 @@
 import express from "express";
+import passport from "passport";
 import { adminRank, userRank } from "../../middleware/userRanks.js";
 import { authenticationRouter } from "./authentication/index.js";
 import { accountRouter } from "./account/index.js";
@@ -14,12 +15,12 @@ export function v1Router(orderCoordinatorProvider: OrderCoordinatorProvider, pos
 {
     const router = express.Router();
 
-    router.use("/auth", userRank, authenticationRouter());
-    router.use("/account", userRank, accountRouter());
-    router.use("/order", userRank, orderRouter(orderCoordinatorProvider));
-    router.use("/position", userRank, positionRouter(positionCoordinatorProvider));
-    router.use("/ws", userRank, websocketRouter(websocketAgentProvider));
-    router.use("/user", adminRank, userRouter());
+    router.use("/auth", authenticationRouter());
+    router.use("/account", passport.authenticate("jwt-bearer", { session: false }), userRank, accountRouter());
+    router.use("/order", passport.authenticate("jwt-bearer", { session: false }), userRank, orderRouter(orderCoordinatorProvider));
+    router.use("/position", passport.authenticate("jwt-bearer", { session: false }), userRank, positionRouter(positionCoordinatorProvider));
+    router.use("/user", passport.authenticate("jwt-bearer", { session: false }), adminRank, userRouter());
+    router.use("/ws", websocketRouter(websocketAgentProvider));
 
     return router;
 }

@@ -9,9 +9,9 @@ export function accountRouter()
 
     router.use(passport.initialize());
 
-    router.post("/credentials", schemaValidator("/account/credentials"), passport.authenticate("jwt-bearer", { session: false }), credentialsSubmitionHandler);
-    router.get("/credentials", passport.authenticate("jwt-bearer", { session: false }), credentialsFetchingHandler);
-    router.get("/user-data", passport.authenticate("jwt-bearer", { session: false }), userDataFetchingHandler);
+    router.post("/credentials", schemaValidator("/account/credentials"), credentialsSubmitionHandler);
+    router.get("/credentials", credentialsFetchingHandler);
+    router.get("/user-data", userDataFetchingHandler);
 
     return router;
 }
