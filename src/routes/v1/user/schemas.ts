@@ -11,7 +11,12 @@ export const amendUser = Joi.object({
     rank: Joi.string().valid(...userRank).required(),
 });
 
+export const deleteUser = Joi.object({
+    email: Joi.string().required(),
+});
+
 export default {
     "/user/create": createUser,
     "/user/amend": amendUser,
+    "/user/delete": deleteUser,
 } as { [key: string]: Joi.ObjectSchema };
