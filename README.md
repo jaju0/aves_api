@@ -216,7 +216,7 @@ Replace the `<...>` parts with your data/preferred settings. You can add additio
 ### Endpoints
 
 The root path of all most up to date rest API endpoints is currently `/v1`.
-For details about the endpoints see [OpenAPI definition](https://petstore.swagger.io/?url=https://path/to/file.yaml).
+For details about the endpoints see [OpenAPI definition](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/jaju0/aves_api/develop/docs/openapi-3.1.0.yml).
 
 > **_NOTE_** Not all users have access to all endpoints. Each user has got a rank: `ADMIN`, `USER` or `NONE`. If the user is not authorized for a specific endpoint the http status code `403 (Forbidden)` is sent.
 
