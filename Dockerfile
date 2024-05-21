@@ -1,5 +1,7 @@
 FROM node:21-alpine
 
+ENV ENVIRONMENT start
+
 WORKDIR /app
 
 COPY package.json .
@@ -11,4 +13,5 @@ COPY . .
 
 EXPOSE 4000
 
-CMD ["pnpm", "run", "dev"]
+RUN 
+CMD ["sh", "-c", "pnpm run ${ENVIRONMENT}"]
