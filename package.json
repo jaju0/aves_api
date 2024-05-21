@@ -6,7 +6,9 @@
   "main": "index.js",
   "scripts": {
     "test": "vitest",
-    "dev": "concurrently -k \"tsc --watch\" \"node --watch=./dist dist/index.js\""
+    "build": "tsc",
+    "dev": "concurrently -k \"tsc --watch\" \"node --watch=./dist dist/index.js\"",
+    "start": "pnpm run build && node dist/index.js"
   },
   "keywords": [],
   "author": "",
