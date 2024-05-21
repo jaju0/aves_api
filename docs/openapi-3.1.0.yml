@@ -1,0 +1,553 @@
+openapi: '3.0.2'
+info:
+  title: Aves API
+  version: '1.0'
+tags:
+  - name: Authentication
+    description: OAuth2 Authentication Endpoints
+  - name: Account
+    description: Account specific Endpoints
+  - name: Order
+    description: Order specific Endpoints
+  - name: Position
+    description: Position specific Endpoints
+  - name: User
+    description: User Administration Endpoints
+paths:
+  /auth/google/callback:
+    get:
+      description: |
+        Use google OAuth2 service for signing in.
+      tags:
+        - Authentication
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessfulLogin"
+        "401":
+          description: "Unauthorized"
+  /refresh:
+    post:
+      description: |
+        Get a new access token. A refresh token must be available via jwt http only cookie.
+      tags:
+        - Authentication
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessfulLogin"
+        "401":
+          description: "Unauthorized"
+  /account/credentials:
+    post:
+      description: |
+        Add credentials (bybit api keys) to your Account.
+      tags:
+        - Account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+                $ref: "#/components/schemas/CredentialsRequest"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccountCredentials"
+        "401":
+          description: "Unauthorized"
+        "403":
+          description: "Forbidden"
+        "422":
+          description: Unprocessable Content
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationErrorResponse"
+    get:
+      description: |
+        Get all credentials of your account.
+      tags:
+        - Account
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccountCredentials"
+        "401":
+          description: "Unauthorized"
+        "403":
+          description: "Forbidden"
+  /account/user-data:
+    get:
+      description: |
+        Get user data of your account.
+      tags:
+        - Account
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserData"
+        "401":
+          description: "Unauthorized"
+        "403":
+          description: "Forbidden"
+  /order/submit:
+    post:
+      description: |
+        Submit an order to the system.
+      tags:
+        - Order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OrderSubmitionRequest"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OrderSubmitionResponse"
+        "401":
+          description: "Unauthorized"
+        "403":
+          description: "Forbidden"
+        "422":
+          description: Unprocessable Content
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationErrorResponse"
+  /order/amend:
+    post:
+      description: |
+        Amend an order on the system.
+      tags:
+        - Order
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OrderAmendmentRequest"
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: "Unauthorized"
+        "403":
+          description: "Forbidden"
+        "422":
+          description: Unprocessable Content
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationErrorResponse"
+  /order/list:
+    get:
+      description: |
+        Get a list of all orders that are currently on the system.
+      tags:
+        - Order
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OrderData"
+        "401":
+          description: "Unauthorized"
+        "403":
+          description: "Forbidden"
+  /position/list:
+    get:
+      description: |
+        Get a list of all currently open positions on the system.
+      tags:
+        - Position
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PositionData"
+        "401":
+          description: "Unauthorized"
+        "403":
+          description: "Forbidden"
+  /position/liquidate:
+    post:
+      description: |
+        Liquidate an open position on the system.
+      tags:
+        - Position
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PositionLiquidationRequest"
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: "Unauthorized"
+        "403":
+          description: "Forbidden"
+  /user/create:
+    post:
+      description: |
+        Create a new user.
+        The user executing this endpoints must have an admin rank.
+      tags:
+        - User
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserCreationRequest"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: "Unauthorized"
+        "403":
+          description: "Forbidden"
+        "422":
+          description: Unprocessable Content
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationErrorResponse"
+  /user/amend:
+    put:
+      description: |
+        Amend the rank of an existing user.
+        The user executing this endpoints must have an admin rank.
+      tags:
+        - User
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserAmendmentRequest"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: "Unauthorized"
+        "403":
+          description: "Forbidden"
+        "422":
+          description: Unprocessable Content
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationErrorResponse"
+  /user/list:
+    get:
+      description: |
+        Get a list of all users.
+        The user executing this endpoints must have an admin rank.
+      tags:
+        - User
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+        "401":
+          description: "Unauthorized"
+        "403":
+          description: "Forbidden"
+  /user/delete:
+    delete:
+      description: |
+        Delete a single user.
+        The user executing this endpoints must have an admin rank.
+      tags:
+        - User
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserDeletionRequest"
+      responses:
+        "200":
+          description: "OK"
+        "401":
+          description: "Unauthorized"
+        "403":
+          description: "Forbidden"
+        "404":
+          description: "Not Found"
+        "422":
+          description: Unprocessable Content
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationErrorResponse"
+components:
+  schemas:
+    ValidationDetail:
+      type: object
+      properties:
+        message:
+          type: string
+        type:
+          type: string
+    ValidationError:
+      type: object
+      properties:
+        original:
+          type: object
+        details:
+          type: array
+          items:
+            $ref: "#/components/schemas/ValidationDetail"
+    ValidationErrorResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        error:
+          $ref: "#/components/schemas/ValidationError"
+    SuccessfulLogin:
+      type: object
+      properties:
+        accessToken:
+          type: string
+    UserData:
+      type: object
+      properties:
+        email:
+          type: string
+        id:
+          type: string
+    Credential:
+      type: object
+      properties:
+        key:
+          type: string
+        secret:
+          type: string
+        demoTrading:
+          type: boolean
+    AccountCredentials:
+      type: object
+      properties:
+        credentials:
+          type: array
+          items:
+            $ref: "#/components/schemas/Credential"
+        active_credential:
+          $ref: "#/components/schemas/Credential"
+    CredentialsRequest:
+      type: object
+      properties:
+        credentials:
+          type: array
+          items:
+            $ref: "#/components/schemas/Credential"
+        active_credential:
+          required: false
+          $ref: "#/components/schemas/Credential"
+    OrderSubmitionRequest:
+      type: object
+      required: [type, side, symbol1, symbol2, regressionSlope]
+      properties:
+        type:
+          type: string
+          description: "Market | Limit | Stop"
+          example: Market
+        side:
+          type: string
+          description: "Buy | Sell"
+          example: Buy
+        symbol1:
+          type: string
+          example: BTCUSDT
+        symbol2:
+          type: string
+          example: ETHUSDT
+        regressionSlope:
+          type: number
+        entryResidual:
+          type: number
+        takeProfit:
+          type: number
+        stopLoss:
+          type: number
+        quoteQty:
+          type: number
+        baseQty:
+          type: number
+    OrderSubmitionResponse:
+      type: object
+      properties:
+        orderId:
+          type: string
+          example: 6647d82feee6930865e2de27
+    OrderAmendmentRequest:
+      type: object
+      properties:
+        orderId:
+          type: string
+          example: 6647d82feee6930865e2de27
+        entryResidual:
+          type: number
+    OrderData:
+      type: object
+      required: [orderId, status, type, side, symbol1, symbol2, symbol1BaseQty, symbol2BaseQty, regressionSlope]
+      properties:
+        orderId:
+          type: string
+          example: 6647d82feee6930865e2de27
+        status:
+          type: string
+          example: Pending
+        type:
+          type: string
+          example: Limit
+        side:
+          type: string
+          example: Buy
+        symbol1:
+          type: string
+          example: BTCUSDT
+        symbol2:
+          type: string
+          example: ETHUSDT
+        symbol1BaseQty:
+          type: string
+          example: 0.001
+        symbol2BaseQty:
+          type: string
+          example: 0.01
+        quoteQty:
+          type: string
+          example: 100
+        entryResidual:
+          type: string
+          example: 0.0238
+        regressionSlope:
+          type: string
+          example: 10.23
+        takeProfit:
+          type: string
+          example: 0
+        stopLoss:
+          type: string
+          example: 0
+    PositionData:
+      type: object
+      properties:
+        positionId:
+          type: string
+        side:
+          type: string
+        symbol1:
+          type: string
+        symbol2:
+          type: string
+        symbol1EntryPrice:
+          type: string
+        symbol2EntryPrice:
+          type: string
+        symbol1BaseQty:
+          type: string
+        symbol2BaseQty:
+          type: string
+        regressionSlope:
+          type: string
+        takeProfit:
+          type: string
+        stopLoss:
+          type: string
+        open:
+          type: boolean
+    PositionLiquidationRequest:
+      type: object
+      required: [symbol1, symbol2]
+      properties:
+        symbol1:
+          type: string
+          example: BTCUSDT
+        symbol2:
+          type: string
+          example: ETHUSDT
+    UserCreationRequest:
+      type: object
+      required: [email, rank]
+      properties:
+        email:
+          type: string
+        rank:
+          type: string
+          description: ADMIN | USER | NONE
+          example: USER
+    UserAmendmentRequest:
+      type: object
+      required: [email, rank]
+      properties:
+        email:
+          type: string
+        rank:
+          type: string
+          description: ADMIN | USER | NONE
+          example: USER
+    UserDeletionRequest:
+      type: object
+      required: [email]
+      properties:
+        email:
+          type: string
+    User:
+      type: object
+      properties:
+        google_id:
+          type: string
+        email:
+          type: string
+        credentials:
+          type: array
+          items:
+            $ref: "#/components/schemas/Credential"
+        active_credential:
+          $ref: "#/components/schemas/Credential"
+        user_rank:
+          type: string
+      
