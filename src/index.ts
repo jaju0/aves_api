@@ -49,10 +49,11 @@ async function main()
     const websocketAgentProvider = new WebsocketAgentProvider();
 
     await mongoose.connect(`mongodb://mongodb:${config.MONGODB_PORT}/${config.MONGODB_DB_NAME}`, {
-        auth: {
+        auth: config.MONGOOSE_USER && config.MONGOOSE_PASS ? {
             username: config.MONGOOSE_USER,
             password: config.MONGOOSE_PASS,
-        },
+        } : undefined,
+        authSource: config.MONGOOSE_AUTH_SOURCE,
     });
 
     await initializeAdminUser();

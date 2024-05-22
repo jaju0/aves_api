@@ -198,8 +198,9 @@ The app is requiring the following environment variables:
 | JSON_WEB_TOKEN_REFRESH_EXPIRES_IN | duration in seconds a generated refresh token is valid | 86400 | true |
 | MONGODB_PORT | port to the locally running MongoDB service | 27017 | true |
 | MONGODB_DB_NAME | name of the MongoDB database this app should use | aves | true |
-| MONGOOSE_USER | MongoDB user name to use for connection establishment | - | true |
-| MONGOOSE_PASS | MongoDB user password to use for connection establishment | - | true |
+| MONGOOSE_USER | MongoDB user name to use for connection establishment | - | false |
+| MONGOOSE_PASS | MongoDB user password to use for connection establishment | - | false |
+| MONGOOSE_AUTH_SOURCE | MongoDB authentication database (admin, user) | - | false |
 | BYBIT_INSTRUMENTS_INFO_REFETCH_INTERVAL_HOURS | interval time in hours for refetching information for bybits instruments (see [Bybit API - Instruments Info](https://bybit-exchange.github.io/docs/v5/market/instrument)) | 24 | true |
 | POSITION_PNL_UPDATE_INTERVAL_MS | interval time in milliseconds for profit and loss recalculation | 5000 | true |
 
