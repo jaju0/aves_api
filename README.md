@@ -196,6 +196,9 @@ The app is requiring the following environment variables:
 | JSON_WEB_TOKEN_EXPIRES_IN | duration in seconds a generated json web token is valid (a authenticated user becomes unauthenticated after) | 600 | true |
 | JSON_WEB_TOKEN_REFRESH_SECRET | secret for jwt authentication refresh token (usage of a random generated key is recommended) | - | true |
 | JSON_WEB_TOKEN_REFRESH_EXPIRES_IN | duration in seconds a generated refresh token is valid | 86400 | true |
+| GOOGLE_OAUTH_CLIENT_ID | Client id of your google oauth2 credentials. Obtain one here: [https://console.cloud.google.com/apis/credentials](https://console.cloud.google.com/apis/credentials) | - | true |
+| GOOGLE_OAUTH_CLIENT_SECRET | Client secret of your google oauth2 credentials. | - | true |
+| GOOGLE_OAUTH_CALLBACK_URL | Callback URL of your google oauth2 credentials. | - | true |
 | MONGODB_PORT | port to the locally running MongoDB service | 27017 | true |
 | MONGODB_DB_NAME | name of the MongoDB database this app should use | aves | true |
 | MONGOOSE_USER | MongoDB user name to use for connection establishment | - | false |
@@ -210,7 +213,7 @@ The app is requiring the following environment variables:
 
 To run a container use the following command:
 
-`docker run -e ENVIRONMENT=start -e SESSION_SECRET=<secret> -e JSON_WEB_TOKEN_SECRET=<jwt-secret> -e JSON_WEB_TOKEN_REFRESH_SECRET=<jwtr-secret> -e INITIAL_ADMIN_EMAIL_ADDRESS=<email-address> -e PORT=<port> -p <port>:<port> --network=aves-service --name aves-api jaju0/aves-api:latest`
+`docker run -e ENVIRONMENT=start -e SESSION_SECRET=<secret> -e JSON_WEB_TOKEN_SECRET=<jwt-secret> -e JSON_WEB_TOKEN_REFRESH_SECRET=<jwtr-secret> -e GOOGLE_OAUTH_CLIENT_ID=<client_id> -e GOOGLE_OAUTH_CLIENT_SECRET=<client_secret> -e GOOGLE_OAUTH_CALLBACK_URL=<callback_url> -e INITIAL_ADMIN_EMAIL_ADDRESS=<email-address> -e PORT=<port> -p <port>:<port> --network=aves-service --name aves-api jaju0/aves-api:latest`
 
 Replace the `<...>` parts with your data/preferred settings. You can add additional environment variables from the table above with dockers `-e` argument.
 

@@ -1,12 +1,7 @@
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
 import passport from "passport";
 import { OAuth2Strategy as GoogleStrategy, Profile, VerifyFunction } from "passport-google-oauth";
+import config from "../../config.js";
 import { User, IUser } from "../../models/User.js";
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const credentials = JSON.parse(fs.readFileSync(__dirname + "/credentials.json", "utf8"));
 
 declare global
 {
@@ -33,9 +28,9 @@ passport.deserializeUser<string>(async (id, done) => {
 });
 
 passport.use(new GoogleStrategy({
-        clientID: credentials.web.client_id,
-        clientSecret: credentials.web.client_secret,
-        callbackURL: credentials.web.redirect_uris[0],
+        clientID: config.GOOGLE_OAUTH_CLIENT_ID,
+        clientSecret: config.GOOGLE_OAUTH_CLIENT_SECRET,
+        callbackURL: config.GOOGLE_OAUTH_CALLBACK_URL,
     },
     async (accessToken: string, refreshToken: string, profile: Profile, done: VerifyFunction) =>
     {
