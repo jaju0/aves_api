@@ -1,7 +1,11 @@
 import passport from "passport";
-import { OAuth2Strategy as GoogleStrategy, Profile, VerifyFunction } from "passport-google-oauth";
+import passportCustom from "passport-custom";
+import { OAuth2Client } from "google-auth-library";
 import config from "../../config.js";
 import { User, IUser } from "../../models/User.js";
+
+const CustomStrategy = passportCustom.Strategy;
+const client = new OAuth2Client();
 
 declare global
 {
@@ -11,41 +15,37 @@ declare global
     }
 }
 
-passport.serializeUser((user, done) => {
-    done(null, user.id);
-});
+passport.use("google-token", new CustomStrategy(
+    async (req, done) => {
+        if(req.query === undefined || req.query.id_token === undefined || typeof req.query.id_token !== "string")
+            return done(undefined, null);
 
-passport.deserializeUser<string>(async (id, done) => {
-    try
-    {
-        const user = await User.findOne({ id });
-        done(null, user);
+        try
+        {
+            const ticket = await client.verifyIdToken({
+                idToken: req.query.id_token,
+                audience: config.GOOGLE_OAUTH_CLIENT_ID,
+            });
+
+            const payload = ticket.getPayload();
+            if(payload === undefined)
+                return done(undefined, null);
+
+            if(payload.email === undefined)
+                return done(undefined, null);
+
+            const foundUser = await User.findOne({ email: payload.email });
+            if(foundUser === null)
+                return done(undefined, null);
+
+            foundUser.google_id = payload.sub;
+            foundUser.save();
+
+            return done(null, foundUser);
+        }
+        catch(error)
+        {
+            return done(undefined, null);
+        }
     }
-    catch(error)
-    {
-        done(error);
-    }
-});
-
-passport.use(new GoogleStrategy({
-        clientID: config.GOOGLE_OAUTH_CLIENT_ID,
-        clientSecret: config.GOOGLE_OAUTH_CLIENT_SECRET,
-        callbackURL: config.GOOGLE_OAUTH_CALLBACK_URL,
-    },
-    async (accessToken: string, refreshToken: string, profile: Profile, done: VerifyFunction) =>
-    {
-        const profileEmails = profile.emails?.map(emailEntry => emailEntry.value);
-
-        let foundUser = await User.findOne({
-            email: { $in: profileEmails },
-        });
-
-        if(foundUser === null)
-            return done(new Error("invalid user"), null);
-
-        foundUser.google_id = profile.id;
-        foundUser.save();
-
-        return done(null, foundUser);
-    }
-));
+))

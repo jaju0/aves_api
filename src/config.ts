@@ -13,8 +13,6 @@ declare global
             JSON_WEB_TOKEN_REFRESH_SECRET: string;
             JSON_WEB_TOKEN_REFRESH_EXPIRES_IN: string;
             GOOGLE_OAUTH_CLIENT_ID: string;
-            GOOGLE_OAUTH_CLIENT_SECRET: string;
-            GOOGLE_OAUTH_CALLBACK_URL: string;
             MONGODB_PORT: string;
             MONGODB_DB_NAME: string;
             MONGOOSE_USER?: string;
@@ -35,8 +33,6 @@ const config = {
     JSON_WEB_TOKEN_REFRESH_SECRET: process.env.JSON_WEB_TOKEN_REFRESH_SECRET,
     JSON_WEB_TOKEN_REFRESH_EXPIRES_IN: process.env.JSON_WEB_TOKEN_REFRESH_EXPIRES_IN === undefined ? 24 * 60 * 60 : +process.env.JSON_WEB_TOKEN_REFRESH_EXPIRES_IN,
     GOOGLE_OAUTH_CLIENT_ID: process.env.GOOGLE_OAUTH_CLIENT_ID,
-    GOOGLE_OAUTH_CLIENT_SECRET: process.env.GOOGLE_OAUTH_CLIENT_SECRET,
-    GOOGLE_OAUTH_CALLBACK_URL: process.env.GOOGLE_OAUTH_CALLBACK_URL,
     MONGODB_PORT: process.env.MONGODB_PORT === undefined ? 27017 : +process.env.MONGODB_PORT,
     MONGODB_DB_NAME: process.env.MONGODB_DB_NAME ?? "aves",
     MONGOOSE_USER: process.env.MONGOOSE_USER,
@@ -58,12 +54,6 @@ if(config.JSON_WEB_TOKEN_REFRESH_SECRET === undefined)
 
 if(config.GOOGLE_OAUTH_CLIENT_ID === undefined)
     throw new Error("environment variable GOOGLE_OAUTH_CLIENT_ID is undefined");
-
-if(config.GOOGLE_OAUTH_CLIENT_SECRET === undefined)
-    throw new Error("environment variable GOOGLE_OAUTH_CLIENT_SECRET is undefined");
-
-if(config.GOOGLE_OAUTH_CALLBACK_URL === undefined)
-    throw new Error("environment variable GOOGLE_OAUTH_CALLBACK_URL is undefined");
 
 if(config.INITIAL_ADMIN_EMAIL_ADDRESS === undefined)
     throw new Error("environment variable INITIAL_ADMIN_EMAIL_ADDRESS is undefined");

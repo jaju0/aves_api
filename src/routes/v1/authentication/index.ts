@@ -11,7 +11,7 @@ export function authenticationRouter()
     router.use(passport.session());
     router.use(cookieParser());
 
-    router.get("/google/callback", passport.authenticate("google", { session: false, scope: ["email"] }), googleCallbackHandler);
+    router.get("/google", passport.authenticate("google-token", { session: false }), googleCallbackHandler);
     router.post("/refresh", refreshHandler);
 
     return router;
