@@ -15,6 +15,7 @@
   "license": "ISC",
   "devDependencies": {
     "@types/cookie-parser": "^1.4.7",
+    "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
     "@types/express-session": "^1.18.0",
     "@types/express-ws": "^3.0.4",
@@ -31,6 +32,7 @@
   "dependencies": {
     "bybit-api": "^3.10.1",
     "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
     "decimal.js": "^10.4.3",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",

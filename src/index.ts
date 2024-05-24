@@ -63,6 +63,8 @@ async function main()
 
     const { app } = expressWs(express());
 
+    app.use(cors());
+
     app.use(session({
         secret: config.SESSION_SECRET,
         resave: false,
