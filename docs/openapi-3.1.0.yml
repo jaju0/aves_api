@@ -14,7 +14,7 @@ tags:
   - name: User
     description: User Administration Endpoints
 paths:
-  /auth/google/callback:
+  /auth/google:
     get:
       description: |
         Use google OAuth2 service for signing in.
@@ -350,6 +350,8 @@ components:
       properties:
         accessToken:
           type: string
+        expirationTimestamp:
+          type: number
     UserData:
       type: object
       properties:

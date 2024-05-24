@@ -5,6 +5,7 @@ import config from "../../../config.js";
 export interface SuccessfulLoginResponse
 {
     accessToken: string;
+    expirationTimestamp: number;
 }
 
 export function googleCallbackHandler(req: Request, res: Response<SuccessfulLoginResponse>)
@@ -12,6 +13,7 @@ export function googleCallbackHandler(req: Request, res: Response<SuccessfulLogi
     if(req.user === undefined)
         return res.sendStatus(401);
 
+    const expirationTimestamp = Date.now()+config.JSON_WEB_TOKEN_REFRESH_EXPIRES_IN*1000;
     const accessToken = jwt.sign({ user_id: req.user.id }, config.JSON_WEB_TOKEN_SECRET, { expiresIn: config.JSON_WEB_TOKEN_EXPIRES_IN });
     const refreshToken = jwt.sign({ user_id: req.user.id }, config.JSON_WEB_TOKEN_REFRESH_SECRET, { expiresIn: config.JSON_WEB_TOKEN_REFRESH_EXPIRES_IN });
 
@@ -22,10 +24,10 @@ export function googleCallbackHandler(req: Request, res: Response<SuccessfulLogi
         maxAge: config.JSON_WEB_TOKEN_REFRESH_EXPIRES_IN * 1000,
     });
 
-    return res.send({ accessToken });
+    return res.send({ accessToken, expirationTimestamp });
 }
 
-export function refreshHandler(req: Request, res: Response)
+export function refreshHandler(req: Request, res: Response<SuccessfulLoginResponse>)
 {
     if(!req.cookies?.jwt)
         return res.sendStatus(401);
@@ -36,7 +38,8 @@ export function refreshHandler(req: Request, res: Response)
         if(error || typeof decoded !== "object" || decoded.user_id === undefined)
             return res.sendStatus(401);
 
+        const expirationTimestamp = Date.now()+config.JSON_WEB_TOKEN_REFRESH_EXPIRES_IN*1000;
         const accessToken = jwt.sign({ user_id: decoded.user_id }, config.JSON_WEB_TOKEN_SECRET, { expiresIn: config.JSON_WEB_TOKEN_EXPIRES_IN });
-        return res.send({ accessToken });
+        return res.send({ accessToken, expirationTimestamp });
     });
 }
