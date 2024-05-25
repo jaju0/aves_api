@@ -17,13 +17,13 @@ declare global
 
 passport.use("google-token", new CustomStrategy(
     async (req, done) => {
-        if(req.query === undefined || req.query.id_token === undefined || typeof req.query.id_token !== "string")
+        if(req.body === undefined || req.body.id_token === undefined || typeof req.body.id_token !== "string")
             return done(undefined, null);
 
         try
         {
             const ticket = await client.verifyIdToken({
-                idToken: req.query.id_token,
+                idToken: req.body.id_token,
                 audience: config.GOOGLE_OAUTH_CLIENT_ID,
             });
 

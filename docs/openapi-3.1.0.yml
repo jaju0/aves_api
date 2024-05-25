@@ -15,11 +15,20 @@ tags:
     description: User Administration Endpoints
 paths:
   /auth/google:
-    get:
+    post:
       description: |
         Use google OAuth2 service for signing in.
       tags:
         - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id_token:
+                  type: string
       parameters:
         - in: query
           name: id_token
