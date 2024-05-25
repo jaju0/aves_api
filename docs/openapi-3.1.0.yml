@@ -29,13 +29,6 @@ paths:
               properties:
                 id_token:
                   type: string
-      parameters:
-        - in: query
-          name: id_token
-          schema:
-            type: string
-          required: true
-          description: Google ID token
       responses:
         "200":
           description: "OK"
