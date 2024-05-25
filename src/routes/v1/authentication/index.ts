@@ -1,7 +1,7 @@
 import express from "express";
 import passport from "passport";
 import cookieParser from "cookie-parser";
-import { googleCallbackHandler, refreshHandler } from "./controllers.js";
+import { googleCallbackHandler, refreshHandler, logoutHandler } from "./controllers.js";
 
 export function authenticationRouter()
 {
@@ -13,6 +13,7 @@ export function authenticationRouter()
 
     router.get("/google", passport.authenticate("google-token", { session: false }), googleCallbackHandler);
     router.post("/refresh", refreshHandler);
+    router.post("/logout", logoutHandler);
 
     return router;
 }

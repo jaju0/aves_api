@@ -43,3 +43,18 @@ export function refreshHandler(req: Request, res: Response<SuccessfulLoginRespon
         return res.send({ accessToken, expirationTimestamp });
     });
 }
+
+export function logoutHandler(req: Request, res: Response)
+{
+    if(!req.cookies?.jwt)
+        return res.sendStatus(401);
+
+    res.clearCookie("jwt", {
+        httpOnly: true,
+        sameSite: "none",
+        secure: true,
+        maxAge: config.JSON_WEB_TOKEN_REFRESH_EXPIRES_IN * 1000,
+    });
+
+    return res.sendStatus(200);
+}

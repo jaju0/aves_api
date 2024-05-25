@@ -51,6 +51,17 @@ paths:
                 $ref: "#/components/schemas/SuccessfulLogin"
         "401":
           description: "Unauthorized"
+  /logout:
+    post:
+      description: |
+        Logout from your account. Clears the refresh token cookie.
+      tags:
+        - Authentication
+      responses:
+        "200":
+          description: "OK"
+        "401":
+          description: "Unauthorized (Not logged in)"
   /account/credentials:
     post:
       description: |
