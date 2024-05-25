@@ -1,6 +1,7 @@
 import "dotenv/config.js";
 import express from "express";
 import session from "express-session";
+import cors from "cors";
 import mongoose from "mongoose";
 import { RestClientV5, WebsocketClient } from "bybit-api";
 import expressWs from "express-ws";
@@ -63,7 +64,10 @@ async function main()
 
     const { app } = expressWs(express());
 
-    app.use(cors());
+    app.use(cors({
+        credentials: true,
+        origin: config.CORS_ORIGINS.split(",").map(origin => origin.trim()),
+    }));
 
     app.use(session({
         secret: config.SESSION_SECRET,

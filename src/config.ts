@@ -7,6 +7,7 @@ declare global
         export interface ProcessEnv
         {
             PORT: string;
+            CORS_ORIGINS: string;
             SESSION_SECRET: string;
             JSON_WEB_TOKEN_SECRET: string;
             JSON_WEB_TOKEN_EXPIRES_IN: string;
@@ -27,6 +28,7 @@ declare global
 
 const config = {
     PORT: process.env.PORT ?? 4000,
+    CORS_ORIGINS: process.env.CORS_ORIGINS ?? "http://localhost,https://localhost",
     SESSION_SECRET: process.env.SESSION_SECRET,
     JSON_WEB_TOKEN_SECRET: process.env.JSON_WEB_TOKEN_SECRET,
     JSON_WEB_TOKEN_EXPIRES_IN: process.env.JSON_WEB_TOKEN_EXPIRES_IN === undefined ? 10 * 60 : +process.env.JSON_WEB_TOKEN_EXPIRES_IN,
