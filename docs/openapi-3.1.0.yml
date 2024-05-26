@@ -379,6 +379,9 @@ components:
           type: string
         id:
           type: string
+        rank:
+          type: string
+          enum: [ADMIN, USER, NONE]
     Credential:
       type: object
       properties:

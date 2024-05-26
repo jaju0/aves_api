@@ -24,6 +24,7 @@ export interface UserDataResponse
 {
     email: string;
     id: string;
+    rank: UserRank;
 }
 
 export async function credentialsSubmitionHandler(req: Request<any, any, CredentialsRequest>, res: Response<CredentialsResponse>)
@@ -111,5 +112,6 @@ export async function userDataFetchingHandler(req: Request, res: Response<UserDa
     return res.json({
         email: req.user.email,
         id: req.user.id,
+        rank: req.user.user_rank,
     });
 }
