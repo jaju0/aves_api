@@ -655,16 +655,10 @@ components:
     User:
       type: object
       properties:
-        google_id:
+        id:
           type: string
         email:
           type: string
-        credentials:
-          type: array
-          items:
-            $ref: "#/components/schemas/Credential"
-        active_credential:
-          $ref: "#/components/schemas/Credential"
-        user_rank:
+        rank:
           type: string
-      
+          enum: [ADMIN, USER, NONE]
