@@ -75,18 +75,12 @@ paths:
         content:
           application/json:
             schema:
-                $ref: "#/components/schemas/CredentialsRequest"
+                $ref: "#/components/schemas/CredentialsSubmitionRequest"
       responses:
         "200":
           description: "OK"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AccountCredentials"
         "401":
           description: "Unauthorized"
-        "403":
-          description: "Forbidden"
         "422":
           description: Unprocessable Content
           content:
@@ -109,6 +103,56 @@ paths:
           description: "Unauthorized"
         "403":
           description: "Forbidden"
+  /account/credentials/activate:
+    put:
+      description: |
+        Activate a credential.
+      tags:
+        - Account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CredentialsActivationRequest"
+      responses:
+        "200":
+          description: "OK"
+        "401":
+          description: "Unauthorized"
+        "404":
+          description: "Not Found"
+        "422":
+          description: Unprocessable Content
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationErrorResponse"
+  /account/credentials/delete:
+    post:
+      description: |
+        Delete a credential.
+      tags:
+        - Account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CredentialsDeletionRequest"
+      responses:
+        "200":
+          description: "OK"
+        "401":
+          description: "Unauthorized"
+        "404":
+          description: "Not Found"
+        "422":
+          description: Unprocessable Content
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationErrorResponse"
   /account/user-data:
     get:
       description: |
@@ -417,6 +461,8 @@ components:
           type: string
         demoTrading:
           type: boolean
+        isActive:
+          type: boolean
     AccountCredentials:
       type: object
       properties:
@@ -426,16 +472,23 @@ components:
             $ref: "#/components/schemas/Credential"
         active_credential:
           $ref: "#/components/schemas/Credential"
-    CredentialsRequest:
+    CredentialsSubmitionRequest:
       type: object
       properties:
         credentials:
           type: array
           items:
             $ref: "#/components/schemas/Credential"
-        active_credential:
-          required: false
-          $ref: "#/components/schemas/Credential"
+    CredentialsActivationRequest:
+      type: object
+      properties:
+        key:
+          type: string
+    CredentialsDeletionRequest:
+      type: object
+      properties:
+        key:
+          type: string
     OrderSubmitionRequest:
       type: object
       required: [type, side, symbol1, symbol2, regressionSlope]
