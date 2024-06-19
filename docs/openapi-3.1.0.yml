@@ -490,9 +490,12 @@ components:
       type: object
       required: [orderId, status, type, side, symbol1, symbol2, symbol1BaseQty, symbol2BaseQty, regressionSlope]
       properties:
-        orderId:
+        id:
           type: string
           example: 6647d82feee6930865e2de27
+        ownerId:
+          type: string
+          example: 666eb30f3c989c023f2ba947
         status:
           type: string
           example: Pending
@@ -532,8 +535,12 @@ components:
     PositionData:
       type: object
       properties:
-        positionId:
+        id:
           type: string
+          example: 666eb382063befaa3da8480a
+        ownerId:
+          type: string
+          example: 666eb379b73d83586062a646
         side:
           type: string
         symbol1:

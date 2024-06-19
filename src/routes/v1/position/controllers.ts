@@ -5,7 +5,8 @@ import { PositionCoordinatorProvider } from "../../../core/PositionCoordinatorPr
 
 export interface PositionData
 {
-    positionId: string;
+    id: string;
+    ownerId: string;
     side: PositionSide;
     symbol1: string;
     symbol2: string;
@@ -28,7 +29,8 @@ export interface PositionLiquidationRequest
 function positionDocumentToResponseData(position: Position)
 {
     return <PositionData> {
-        positionId: position.id,
+        id: position.id,
+        ownerId: position.ownerId,
         side: position.side,
         symbol1: position.symbol1,
         symbol2: position.symbol2,

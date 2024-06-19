@@ -11,7 +11,8 @@ export interface BaseQty
 
 export interface OrderData
 {
-    orderId: string;
+    id: string;
+    ownerId: string;
     status: OrderStatus;
     type: OrderType;
     side: OrderSide;
@@ -61,7 +62,8 @@ export type OrderListResponse = OrderData[];
 function orderDocumentToResponseData(order: Order)
 {
     return <OrderData> {
-        orderId: order.id,
+        id: order.id,
+        ownerId: order.ownerId,
         status: order.status,
         type: order.type,
         side: order.side,
