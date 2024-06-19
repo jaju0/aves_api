@@ -179,6 +179,32 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ValidationErrorResponse"
+  /order/cancel:
+    post:
+      description: |
+        Cancel an order on the system.
+      tags:
+        - Order
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OrderCancelationRequest"
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+        "422":
+          description: Unprocessable Content
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationErrorResponse"
   /order/list:
     get:
       description: |
@@ -454,6 +480,12 @@ components:
           example: 6647d82feee6930865e2de27
         entryResidual:
           type: number
+    OrderCancelationRequest:
+      type: object
+      properties:
+        orderId:
+          type: string
+          example: 6647d82feee6930865e2de27
     OrderData:
       type: object
       required: [orderId, status, type, side, symbol1, symbol2, symbol1BaseQty, symbol2BaseQty, regressionSlope]

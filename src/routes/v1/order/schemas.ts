@@ -22,9 +22,14 @@ export const submitOrder = Joi.object({
 export const amendOrder = Joi.object({
     orderId: Joi.string().required(),
     entryResidual: Joi.number().required(),
-})
+});
+
+export const cancelOrder = Joi.object({
+    orderId: Joi.string().required(),
+});
 
 export default {
     "/order/submit": submitOrder,
     "/order/amend": amendOrder,
+    "/order/cancel": cancelOrder,
 } as { [key: string]: Joi.ObjectSchema };

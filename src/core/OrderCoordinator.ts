@@ -60,6 +60,23 @@ export class OrderCoordinator
         return orderContext;
     }
 
+    public async cancelOrder(orderId: string)
+    {
+        const orderContext = this.orderContexts.get(orderId);
+        if(orderContext === undefined)
+            return;
+
+        const order = await Order.findById(orderId);
+        if(order != undefined)
+        {
+            order.status = "Failed";
+            order.save();
+        }
+
+        orderContext.shutdown();
+        this.orderContexts.delete(orderId);
+    }
+
     public getOrderData(orderId: string)
     {
         return this.orderContexts.get(orderId);

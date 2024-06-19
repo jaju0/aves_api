@@ -51,6 +51,11 @@ export interface OrderAmendmentRequest
     entryResidual: number;
 }
 
+export interface OrderCancelationRequest
+{
+    orderId: string;
+}
+
 export type OrderListResponse = OrderData[];
 
 function orderDocumentToResponseData(order: Order)
@@ -126,6 +131,26 @@ export async function orderAmendmentHandler(orderCoordinatorProvider: OrderCoord
         return res.sendStatus(404);
 
     orderData.amendEntryResidual(data.entryResidual);
+    return res.sendStatus(200);
+}
+
+export async function orderCancelationHandler(orderCoordinatorProvider: OrderCoordinatorProvider, req: Request<any, any, OrderCancelationRequest>, res: Response)
+{
+    if(req.user === undefined)
+        return res.sendStatus(401);
+
+    const activeCredential = await Credential.getActiveCredential(req.user.id);
+    if(activeCredential === "error")
+        return res.sendStatus(500);
+    else if(activeCredential == undefined)
+        return res.sendStatus(400);
+    
+    const orderCoordinator = orderCoordinatorProvider.get(activeCredential.key, activeCredential.secret, activeCredential.demoTrading);
+    const orderData = orderCoordinator.getOrderData(req.body.orderId);
+    if(orderData === undefined)
+        return res.sendStatus(404);
+
+    orderCoordinator.cancelOrder(req.body.orderId);
     return res.sendStatus(200);
 }
 
