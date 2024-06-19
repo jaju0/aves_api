@@ -22,17 +22,5 @@ export async function websocketHandler(websocketAgentProvider: WebsocketAgentPro
         return;
     }
 
-    const activeCredential = await Credential.getActiveCredential(req.user.id);
-    if(activeCredential === "error")
-    {
-        ws.close(1008);
-        return;
-    }
-    else if(activeCredential == undefined)
-    {
-        ws.close(1008);
-        return;
-    }
-
     websocketAgentProvider.createAgent(ws, req.user);
 }
