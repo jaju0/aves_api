@@ -1,23 +1,34 @@
 import { Request, Response } from "express";
 import { Credential, ICredential } from "../../../models/Credential.js";
+import { UserRank } from "../../../models/User.js";
 
 export interface CredentialParams
 {
     key: string;
     secret: string;
     demoTrading: boolean;
+    isActive: boolean;
 }
 
 export interface CredentialsResponse
 {
     credentials: CredentialParams[];
-    active_credential: CredentialParams;
+    active_credential?: CredentialParams;
 }
 
-export interface CredentialsRequest
+export interface CredentialsSubmitionRequest
 {
-    credentials?: CredentialParams[];
-    active_credential?: CredentialParams;
+    credentials: CredentialParams[];
+}
+
+export interface CredentialsActivationRequest
+{
+    key: string;
+}
+
+export interface CredentialsDeletionRequest
+{
+    key: string;
 }
 
 export interface UserDataResponse
@@ -27,7 +38,7 @@ export interface UserDataResponse
     rank: UserRank;
 }
 
-export async function credentialsSubmitionHandler(req: Request<any, any, CredentialsRequest>, res: Response<CredentialsResponse>)
+export async function credentialsSubmitionHandler(req: Request<any, any, CredentialsSubmitionRequest>, res: Response)
 {
     if(req.user === undefined)
         return res.sendStatus(401);
@@ -37,42 +48,59 @@ export async function credentialsSubmitionHandler(req: Request<any, any, Credent
     const data = req.body;
     const postedCredentials = new Array<ICredential>();
 
-    if(data.active_credential)
-        postedCredentials.push({ ...data.active_credential, userId, isActive: false });
     if(data.credentials)
-        postedCredentials.push(...data.credentials.map((credential: CredentialParams) => ({ ...credential, userId, isActive: false })));
+        postedCredentials.push(...data.credentials.map((credential: CredentialParams) => ({ ...credential, userId })));
 
     await Credential.add(userId, postedCredentials);
 
-    if(data.active_credential)
-    {
-        const credentialToActivate = await Credential.getCredentialByKey(data.active_credential.key);
-        if(credentialToActivate === "error")
-            return res.sendStatus(500);
-        if(credentialToActivate)
-            await credentialToActivate.activate(userId);
-    }
+    return res.sendStatus(200);
+}
 
-    const userCredentials = await Credential.getCredentialsByUserId(userId);
-    if(userCredentials === "error")
+export async function credentialsActivationHandler(req: Request<any, any, CredentialsActivationRequest>, res: Response)
+{
+    if(req.user === undefined)
+        return res.sendStatus(401);
+
+    const userId = req.user.id;
+
+    const data = req.body;
+
+    const credentialToActivate = await Credential.getCredentialByKey(data.key);
+    if(credentialToActivate === "error")
         return res.sendStatus(500);
+    if(credentialToActivate === undefined)
+        return res.sendStatus(404);
 
-    const activeCredential = await Credential.getActiveCredential(userId);
-    if(activeCredential === "error")
+    if(userId !== credentialToActivate.userId)
+        return res.sendStatus(401);
+
+    await credentialToActivate.activate();
+    return res.sendStatus(200);
+}
+
+export async function credentialsDeletionHandler(req: Request<any, any, CredentialsDeletionRequest>, res: Response)
+{
+    if(req.user === undefined)
+        return res.sendStatus(401);
+
+    const userId = req.user.id;
+
+    const data = req.body;
+
+    const credentialToDelete = await Credential.getCredentialByKey(data.key);
+    if(credentialToDelete === "error")
         return res.sendStatus(500);
+    if(credentialToDelete === undefined)
+        return res.sendStatus(404);
 
-    return res.json({
-        credentials: userCredentials.map(credential => ({
-            key: credential.key,
-            secret: credential.secret,
-            demoTrading: credential.demoTrading,
-        })),
-        active_credential: activeCredential === undefined ? {} as CredentialParams : {
-            key: activeCredential.key,
-            secret: activeCredential.secret,
-            demoTrading: activeCredential.demoTrading,
-        },
-    })
+    if(userId !== credentialToDelete.userId)
+        return res.sendStatus(401);
+
+    const deletionResponse = await Credential.deleteOne({ key: data.key });
+    if(deletionResponse.deletedCount === 0)
+        return res.sendStatus(404);
+
+    return res.sendStatus(200);
 }
 
 export async function credentialsFetchingHandler(req: Request, res: Response<CredentialsResponse>)
@@ -95,11 +123,13 @@ export async function credentialsFetchingHandler(req: Request, res: Response<Cre
             key: credential.key,
             secret: credential.secret,
             demoTrading: credential.demoTrading,
+            isActive: credential.isActive,
         })),
-        active_credential: activeCredential == undefined ? {} as CredentialParams : {
+        active_credential: activeCredential == undefined ? undefined : {
             key: activeCredential.key,
             secret: activeCredential.secret,
             demoTrading: activeCredential.demoTrading,
+            isActive: activeCredential.isActive,
         }
     });
 }

@@ -11,13 +11,14 @@ export interface ICredential
 
 interface CredentialMethods
 {
-    activate(userId: string): Promise<void>;
+    activate(): Promise<void>;
     deactivate(): Promise<void>;
 }
 
 interface CredentialModel extends Model<ICredential, {}, CredentialMethods>
 {
     add(userId: string, credentials: ICredential[]): Promise<void | "error">;
+    activate(key: string): Promise<void | "error">;
     getActiveCredential(userId: string): Promise<Credential | undefined | "error">;
     getCredentialByKey(key: string): Promise<Credential | undefined | "error">;
     getCredentialsByUserId(userId: string): Promise<Credential[] | "error">;
@@ -31,8 +32,8 @@ const credentialSchema = new mongoose.Schema<ICredential, CredentialModel, Crede
     isActive: { type: Boolean, required: true },
 });
 
-credentialSchema.method("activate", async function activate(userId: string) {
-    await Credential.updateMany({ userId }, { isActive: false });
+credentialSchema.method("activate", async function activate() {
+    await Credential.updateMany({ userId: this.userId }, { isActive: false });
     await this.updateOne({ isActive: true });
     this.isActive = true;
 });
@@ -45,11 +46,15 @@ credentialSchema.method("deactivate", async function deactivate() {
 credentialSchema.static("add", async function add(userId: string, credentials: ICredential[]) {
     const userCredentials = await this.find({ userId });
     const credentialsToInsert = new Array<ICredential>();
+    let setActiveKey: string | undefined = undefined;
     for(const newCredential of credentials)
     {
         const foundCredential = userCredentials.find(credential => newCredential.key === credential.key);
         if(foundCredential !== undefined)
             continue;
+
+        if(newCredential.isActive)
+            setActiveKey = newCredential.key;
 
         newCredential.isActive = false;
         credentialsToInsert.push(newCredential);
@@ -58,12 +63,22 @@ credentialSchema.static("add", async function add(userId: string, credentials: I
     try
     {
         await this.insertMany(credentialsToInsert);
+        if(setActiveKey)
+            await this.activate(setActiveKey);
     }
     catch(error)
     {
         console.log(error);
         return "error";
     }
+});
+
+credentialSchema.static("activate", async function activate(key: string) {
+    const credentialToActivate = await Credential.findOne({ key });
+    if(credentialToActivate != null)
+        return await credentialToActivate.activate();
+
+    return "error";
 });
 
 credentialSchema.static("getActiveCredential", async function getActiveCredential(userId: string) {

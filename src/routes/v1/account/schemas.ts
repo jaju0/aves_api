@@ -1,27 +1,26 @@
 import Joi from "joi";
-import { CredentialsResponse } from "./controllers.js";
 
 export const credentialSchema = Joi.object({
     key: Joi.string().required(),
     secret: Joi.string().required(),
     demoTrading: Joi.boolean().required(),
+    isActive: Joi.boolean().required(),
 });
 
-export const submitCredentials = Joi.alternatives<CredentialsResponse>().try(
-    Joi.object({
-        credentials: Joi.array().items(credentialSchema).required(),
-        active_credential: credentialSchema.required(),
-    }),
-    Joi.object({
-        credentials: Joi.array().items(credentialSchema).required(),
-        active_credential: credentialSchema.optional(),
-    }),
-    Joi.object({
-        credentials: Joi.array().items(credentialSchema).optional(),
-        active_credential: credentialSchema.required(),
-    })
-);
+export const submitCredentials = Joi.object({
+    credentials: Joi.array().items(credentialSchema).required(),
+});
+
+export const activateCredential = Joi.object({
+    key: Joi.string().required(),
+});
+
+export const deleteCredential = Joi.object({
+    key: Joi.string().required(),
+});
 
 export default {
     "/account/credentials": submitCredentials,
+    "/account/credentials/activate": activateCredential,
+    "/account/credentials/delete": deleteCredential,
 } as { [key: string]: Joi.ObjectSchema | Joi.AlternativesSchema };
