@@ -3,6 +3,7 @@ import { Order, OrderSide, OrderStatus, OrderType } from "../models/Order.js";
 
 export interface OrderEventData
 {
+    id: string;
     ownerId: string;
     status: OrderStatus;
     type: OrderType;
@@ -20,6 +21,7 @@ export interface OrderEventData
 
 export interface PositionEventData
 {
+    id: string;
     ownerId: string;
     side: PositionSide;
     symbol1: string;
@@ -38,6 +40,7 @@ export interface PositionEventData
 export function orderModelToEventData(order: Order)
 {
     const eventData = <OrderEventData> {
+        id: order.id,
         ownerId: order.ownerId,
         status: order.status,
         type: order.type,
@@ -59,6 +62,7 @@ export function orderModelToEventData(order: Order)
 export function positionModelToEventData(position: Position)
 {
     const eventData = <PositionEventData> {
+        id: position.id,
         ownerId: position.ownerId,
         side: position.side,
         symbol1: position.symbol1,
