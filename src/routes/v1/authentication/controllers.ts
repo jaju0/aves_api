@@ -38,7 +38,7 @@ export function refreshHandler(req: Request, res: Response<SuccessfulLoginRespon
         if(error || typeof decoded !== "object" || decoded.user_id === undefined)
             return res.sendStatus(401);
 
-        const expirationTimestamp = Date.now()+config.JSON_WEB_TOKEN_REFRESH_EXPIRES_IN*1000;
+        const expirationTimestamp = Date.now()+config.JSON_WEB_TOKEN_EXPIRES_IN*1000;
         const accessToken = jwt.sign({ user_id: decoded.user_id }, config.JSON_WEB_TOKEN_SECRET, { expiresIn: config.JSON_WEB_TOKEN_EXPIRES_IN });
         return res.send({ accessToken, expirationTimestamp });
     });
