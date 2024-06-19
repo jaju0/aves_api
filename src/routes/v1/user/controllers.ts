@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { Credential } from "../../../models/Credential.js";
-import { IUser, User, UserRank } from "../../../models/User.js";
+import { User, UserRank } from "../../../models/User.js";
 
 export interface UserCreationRequest
 {
@@ -19,16 +19,17 @@ export interface UserDeletionRequest
     email: string;
 }
 
-export async function createUserHandler(req: Request<any, any, UserCreationRequest>, res: Response<IUser>)
+export interface UserDataResponse
+{
+    id: string;
+    email: string;
+    rank: UserRank;
+}
+
+export async function createUserHandler(req: Request<any, any, UserCreationRequest>, res: Response<UserDataResponse>)
 {
     if(req.user === undefined)
         return res.sendStatus(401);
-
-    const activeCredential = await Credential.getActiveCredential(req.user.id);
-    if(activeCredential === "error")
-        return res.sendStatus(500);
-    else if(activeCredential == undefined)
-        return res.sendStatus(400);
 
     const data = req.body;
 
@@ -36,19 +37,17 @@ export async function createUserHandler(req: Request<any, any, UserCreationReque
     if(createdUser === undefined)
         return res.sendStatus(409);
 
-    return res.json(createdUser);
+    return res.json({
+        id: createdUser.id,
+        email: createdUser.email,
+        rank: createdUser.user_rank,
+    });
 }
 
-export async function amendUserHandler(req: Request<any, any, UserAmendmentRequest>, res: Response<IUser>)
+export async function amendUserHandler(req: Request<any, any, UserAmendmentRequest>, res: Response<UserDataResponse>)
 {
     if(req.user === undefined)
         return res.sendStatus(401);
-
-    const activeCredential = await Credential.getActiveCredential(req.user.id);
-    if(activeCredential === "error")
-        return res.sendStatus(500);
-    else if(activeCredential == undefined)
-        return res.sendStatus(400);
 
     const data = req.body;
 
@@ -56,35 +55,33 @@ export async function amendUserHandler(req: Request<any, any, UserAmendmentReque
     if(updatedUser === undefined)
         return res.sendStatus(404);
 
-    return res.json(updatedUser);
+    return res.json({
+        id: updatedUser.id,
+        email: updatedUser.email,
+        rank: updatedUser.user_rank,
+    });
 }
 
-export async function getUserListHandler(req: Request, res: Response<IUser[]>)
+export async function getUserListHandler(req: Request, res: Response<UserDataResponse[]>)
 {
     if(req.user === undefined)
         return res.sendStatus(401);
-
-    const activeCredential = await Credential.getActiveCredential(req.user.id);
-    if(activeCredential === "error")
-        return res.sendStatus(500);
-    else if(activeCredential == undefined)
-        return res.sendStatus(400);
     
     const users = await User.find();
 
-    return res.json(users);
+    const userDataList = users.map(user => ({
+        id: user.id,
+        email: user.email,
+        rank: user.user_rank,
+    }));
+
+    return res.json(userDataList);
 }
 
 export async function deleteUserHandler(req: Request<any, any, UserDeletionRequest>, res: Response)
 {
     if(req.user === undefined)
         return res.sendStatus(401);
-
-    const activeCredential = await Credential.getActiveCredential(req.user.id);
-    if(activeCredential === "error")
-        return res.sendStatus(500);
-    else if(activeCredential == undefined)
-        return res.sendStatus(400);
 
     const data = req.body;
 

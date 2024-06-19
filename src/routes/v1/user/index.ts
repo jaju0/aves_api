@@ -10,9 +10,9 @@ export function userRouter()
     router.use(passport.initialize());
 
     router.post("/create", schemaValidator("/user/create"), createUserHandler);
-    router.put("/amend", schemaValidator("/user/amend"), amendUserHandler);
+    router.post("/amend", schemaValidator("/user/amend"), amendUserHandler);
     router.get("/list", getUserListHandler);
-    router.delete("/delete", schemaValidator("/user/delete"), deleteUserHandler);
+    router.post("/delete", schemaValidator("/user/delete"), deleteUserHandler);
 
     return router;
 }
