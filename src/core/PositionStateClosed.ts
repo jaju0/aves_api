@@ -9,13 +9,12 @@ export class PositionStateClosed extends PositionState
     constructor(context: PositionContext)
     {
         super(context);
-
-        this.context.position.open = false;
-        this.context.position.save();
     }
 
     public async initialize()
     {
+        this.context.position.open = false;
+        await this.context.position.save();
         await this.context.shutdown();
         this.context.emit("closed");
     }
