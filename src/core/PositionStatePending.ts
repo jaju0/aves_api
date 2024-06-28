@@ -22,7 +22,8 @@ export class PositionStatePending extends PositionState
                 this.context.position.symbol1,
                 this.context.position.symbol2,
                 new Decimal(this.context.position.regressionSlope),
-                this.context.wsClient
+                this.context.wsClient,
+                this.context.restClient
             );
 
             this.context.residualFeed.on("update", this.context.residualUpdate.bind(this.context));
