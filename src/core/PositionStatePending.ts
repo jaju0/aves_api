@@ -10,11 +10,13 @@ import { PnlFeed } from "./PnlFeed.js";
 export class PositionStatePending extends PositionState
 {
     private lastPnlUpdateTimestamp: number;
+    private isLiquidating: boolean;
 
     constructor(context: PositionContext)
     {
         super(context);
         this.lastPnlUpdateTimestamp = 0;
+        this.isLiquidating = false;
 
         if(!this.context.residualFeed)
         {
@@ -117,6 +119,11 @@ export class PositionStatePending extends PositionState
 
     public async liquidate()
     {
+        if(this.isLiquidating)
+            return;
+
+        this.isLiquidating = true;
+
         await this.context.restClient.submitOrder({
             category: "linear",
             orderType: "Market",
@@ -133,7 +140,7 @@ export class PositionStatePending extends PositionState
             qty: this.context.position.symbol2BaseQty.toString(),
         });
 
-        this.context.transitionTo(new PositionStateClosed(this.context));
+        await this.context.transitionTo(new PositionStateClosed(this.context));
     }
 
 }
