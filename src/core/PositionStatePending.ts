@@ -48,35 +48,24 @@ export class PositionStatePending extends PositionState
 
     public async residualUpdate(residual: Decimal)
     {
-        let entryResidual: Decimal;
-        {
-            // y = mx+e
-            const regressionSlope = new Decimal(this.context.position.regressionSlope);
-            const predictedSymbol1Price = regressionSlope.times(this.context.position.symbol2EntryPrice);
-            entryResidual = new Decimal(this.context.position.symbol1EntryPrice).minus(predictedSymbol1Price);
-        }
+        const stopLoss = this.context.position.stopLoss === undefined ? undefined : new Decimal(this.context.position.stopLoss);
+        const takeProfit = this.context.position.takeProfit === undefined ? undefined : new Decimal(this.context.position.takeProfit);
 
         if(this.context.position.side === "Long")
         {
-            const stopLoss = this.context.position.stopLoss === undefined ? undefined : entryResidual.minus(this.context.position.stopLoss);
-            const takeProfit = this.context.position.takeProfit === undefined ? undefined : entryResidual.plus(this.context.position.takeProfit);
-
             const stopLossTriggered = stopLoss === undefined ? false : stopLoss.greaterThan(residual);
             const takeProfitTriggered = takeProfit === undefined ? false : takeProfit.lessThan(residual);
 
             if(stopLossTriggered || takeProfitTriggered)
-                this.liquidate();
+                await this.liquidate();
         }
         else if(this.context.position.side === "Short")
         {
-            const stopLoss = this.context.position.stopLoss === undefined ? undefined : entryResidual.plus(this.context.position.stopLoss);
-            const takeProfit = this.context.position.takeProfit === undefined ? undefined : entryResidual.minus(this.context.position.takeProfit);
-
             const stopLossTriggered = stopLoss === undefined ? false : stopLoss.lessThan(residual);
             const takeProfitTriggered = takeProfit === undefined ? false : takeProfit.greaterThan(residual);
 
             if(stopLossTriggered || takeProfitTriggered)
-                this.liquidate();
+                await this.liquidate();
         }
     }
 
