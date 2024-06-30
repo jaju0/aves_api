@@ -2,18 +2,19 @@ import Decimal from "decimal.js";
 import { OrderState } from "./OrderState.js";
 import { OrderContext } from "./OrderContext.js";
 import { OrderStateExecute } from "./OrderStateExecute.js";
-import { ResidualFeed } from "./ResidualFeed.js";
 import { OrderStateFailed } from "./OrderStateFailed.js";
 
 type TriggerDirection = "None" | "FromTop" | "FromBottom";
 
 export class OrderStatePending extends OrderState
 {
+    private isTriggered: boolean;
     private triggerDirection: TriggerDirection;
 
     constructor(context: OrderContext)
     {
         super(context);
+        this.isTriggered = false;
         this.triggerDirection = "None";
     }
 
@@ -38,14 +39,18 @@ export class OrderStatePending extends OrderState
         if(!this.context.residualFeed)
         {
             this.context.residualFeed = this.context.residualFeedProvider.get(this.context.order.symbol1, this.context.order.symbol2, new Decimal(this.context.order.regressionSlope));
-        this.context.residualFeed.on("update", this.context.residualUpdate.bind(this.context));
+            this.context.residualFeed.on("update", this.context.residualUpdate.bind(this.context));
         }
     }
 
     public async residualUpdate(residual: Decimal)
     {
+        if(this.isTriggered)
+            return;
+
         if(this.context.order.entryResidual === undefined)
         {
+            this.isTriggered = true;
             this.context.transitionTo(new OrderStateFailed(this.context));
             return;
         }
@@ -59,7 +64,10 @@ export class OrderStatePending extends OrderState
         const triggered = fromBottomTriggered || fromTopTriggered;
 
         if(triggered && !(this.context.State instanceof OrderStateExecute))
+        {
+            this.isTriggered = true;
             await this.context.transitionTo(new OrderStateExecute(this.context));
+        }
     }
 
 }
