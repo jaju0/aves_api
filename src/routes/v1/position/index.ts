@@ -1,7 +1,7 @@
 import express from "express";
 import passport from "passport";
 import { PositionCoordinatorProvider } from "../../../core/PositionCoordinatorProvider.js";
-import { getPositionListHandler, liquidationHandler } from "./controllers.js";
+import { getPositionListHandler, liquidationHandler, positionAmendmentHandler } from "./controllers.js";
 import { schemaValidator } from "../schemaValidator.js";
 
 export function positionRouter(positionCoordinatorProvider: PositionCoordinatorProvider)
@@ -12,6 +12,7 @@ export function positionRouter(positionCoordinatorProvider: PositionCoordinatorP
 
     router.get("/list", getPositionListHandler.bind(undefined, positionCoordinatorProvider));
     router.post("/liquidate", schemaValidator("/position/liquidate"), liquidationHandler.bind(undefined, positionCoordinatorProvider));
+    router.post("/amend", schemaValidator("/position/amend"), positionAmendmentHandler.bind(undefined, positionCoordinatorProvider));
 
     return router;
 }

@@ -26,6 +26,14 @@ export interface PositionLiquidationRequest
     symbol2: string;
 }
 
+export interface PositionAmendmentRequest
+{
+    symbol1: string;
+    symbol2: string;
+    takeProfit?: string | null;
+    stopLoss?: string | null;
+}
+
 function positionDocumentToResponseData(position: Position)
 {
     return <PositionData> {
@@ -89,7 +97,34 @@ export async function liquidationHandler(positionCoordinatorProvider: PositionCo
     if(context === undefined)
         return res.sendStatus(404);
 
-    await context.liquidate();
+    context.liquidate();
+
+    return res.sendStatus(200);
+}
+
+export async function positionAmendmentHandler(positionCoordinatorProvider: PositionCoordinatorProvider, req: Request<any, any, PositionAmendmentRequest>, res: Response)
+{
+    if(req.user === undefined)
+        return res.sendStatus(401);
+
+    const activeCredential = await Credential.getActiveCredential(req.user.id);
+    if(activeCredential === "error")
+        return res.sendStatus(500);
+    else if(activeCredential == undefined)
+        return res.sendStatus(400);
+
+    const data = req.body;
+
+    const pair = `${req.user.id}-${data.symbol1}-${data.symbol2}`;
+    const positionCoordinator = positionCoordinatorProvider.get(activeCredential.key, activeCredential.secret, activeCredential.demoTrading);
+    const context = positionCoordinator.PositionContexts.get(pair);
+    if(context === undefined)
+        return res.sendStatus(404);
+
+    context.amendExitOrders({
+        takeProfit: data.takeProfit,
+        stopLoss: data.stopLoss,
+    });
 
     return res.sendStatus(200);
 }
