@@ -51,6 +51,25 @@ export class PositionContext extends EventEmitter<{
         this.residualFeed?.off("update", this.residualUpdate.bind(this));
         this.residualFeed?.shutdown();
         this.residualFeed = undefined;
+
+    public async amendExitOrders(exitOrders: { takeProfit?: string | null, stopLoss?: string | null })
+    {
+        if(exitOrders.takeProfit !== undefined)
+        {
+            if(exitOrders.takeProfit === null)
+                this.position.takeProfit = undefined;
+            else
+                this.position.takeProfit = exitOrders.takeProfit;
+        }
+        if(exitOrders.stopLoss !== undefined)
+        {
+            if(exitOrders.stopLoss === null)
+                this.position.stopLoss = undefined;
+            else
+                this.position.stopLoss = exitOrders.stopLoss;
+        }
+
+        await this.position.save();
     }
 
     public async transitionTo(state: PositionState)
