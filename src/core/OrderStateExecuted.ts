@@ -47,6 +47,8 @@ export class OrderStateExecuted extends OrderState
             symbol2BaseQty: this.context.order.symbol2BaseQty,
             symbol1EntryPrice: symbol1FilledPrice,
             symbol2EntryPrice: symbol2FilledPrice,
+            takeProfit: this.context.order.takeProfit,
+            stopLoss: this.context.order.stopLoss,
         });
 
         this.context.order.status = "Executed";
