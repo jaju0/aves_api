@@ -51,7 +51,7 @@ export class PositionContext extends EventEmitter<{
         if(this.symbol1TickerFeed)
         {
             this.tickerFeedProvider.remove(this.symbol1TickerFeed);
-        this.symbol1TickerFeed = undefined;
+            this.symbol1TickerFeed = undefined;
         }
 
         if(this.symbol2TickerFeed)
@@ -64,7 +64,7 @@ export class PositionContext extends EventEmitter<{
         {
             this.residualFeed.off("update", this.residualUpdate.bind(this));
             this.residualFeedProvider.remove(this.residualFeed);
-        this.residualFeed = undefined;
+            this.residualFeed = undefined;
         }
     }
 
