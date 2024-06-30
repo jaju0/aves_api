@@ -54,6 +54,26 @@ export class OrderContext extends EventEmitter<{
         await this.order.save();
     }
 
+    public async amendExitOrders(exitOrders: { takeProfit?: string | null, stopLoss?: string | null })
+    {
+        if(exitOrders.takeProfit !== undefined)
+        {
+            if(exitOrders.takeProfit === null)
+                this.order.takeProfit = undefined;
+            else
+                this.order.takeProfit = exitOrders.takeProfit;
+        }
+        if(exitOrders.stopLoss !== undefined)
+        {
+            if(exitOrders.stopLoss === null)
+                this.order.stopLoss = undefined;
+            else
+                this.order.stopLoss = exitOrders.stopLoss;
+        }
+
+        await this.order.save();
+    }
+
     public async shutdown()
     {
         this.residualFeed?.off("update", this.residualUpdate.bind(this));

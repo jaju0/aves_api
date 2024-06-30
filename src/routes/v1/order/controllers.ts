@@ -49,7 +49,9 @@ export interface OrderSubmitionResponse
 export interface OrderAmendmentRequest
 {
     orderId: string;
-    entryResidual: number;
+    entryResidual?: number;
+    takeProfit?: string | null;
+    stopLoss?: string | null;
 }
 
 export interface OrderCancelationRequest
@@ -132,7 +134,11 @@ export async function orderAmendmentHandler(orderCoordinatorProvider: OrderCoord
     if(orderData === undefined)
         return res.sendStatus(404);
 
-    orderData.amendEntryResidual(data.entryResidual);
+    if(data.entryResidual !== undefined)
+        orderData.amendEntryResidual(data.entryResidual);
+    if(data.takeProfit !== undefined || data.stopLoss !== undefined)
+        orderData.amendExitOrders({ takeProfit: data.takeProfit, stopLoss: data.stopLoss });
+
     return res.sendStatus(200);
 }
 
