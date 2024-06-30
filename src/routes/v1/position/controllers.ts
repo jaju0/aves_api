@@ -14,6 +14,7 @@ export interface PositionData
     symbol2EntryPrice: string;
     symbol1BaseQty: string;
     symbol2BaseQty: string;
+    lastPnl: string;
     regressionSlope: string;
     takeProfit?: string;
     stopLoss?: string;
@@ -46,6 +47,7 @@ function positionDocumentToResponseData(position: Position)
         symbol2EntryPrice: position.symbol2EntryPrice,
         symbol1BaseQty: position.symbol1BaseQty,
         symbol2BaseQty: position.symbol2BaseQty,
+        lastPnl: position.lastPnl,
         regressionSlope: position.regressionSlope,
         takeProfit: position.takeProfit,
         stopLoss: position.stopLoss,
