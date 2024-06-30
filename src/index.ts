@@ -6,6 +6,7 @@ import mongoose from "mongoose";
 import { RestClientV5, WebsocketClient } from "bybit-api";
 import expressWs from "express-ws";
 import { User } from "./models/User.js";
+import { TradeFeedProvider } from "./core/TradeFeedProvider.js";
 import { OrderCoordinatorProvider } from "./core/OrderCoordinatorProvider.js";
 import { BybitRestClientProvider } from "./core/BybitRestClientProvider.js";
 import { InstrumentsInfoProvider } from "./core/InstrumentsInfoProvider.js";
@@ -43,6 +44,7 @@ async function main()
     const instrumentsInfoRefetchIntervalMs = config.BYBIT_INSTRUMENTS_INFO_REFETCH_INTERVAL_HOURS * 60 * 60 * 1000;
 
     const bybitRestClientProvider = new BybitRestClientProvider();
+    const tradeFeedProvider = new TradeFeedProvider(bybitWsClient);
     const instInfoProvider = new InstrumentsInfoProvider(bybitPublicRestClient, instrumentsInfoRefetchIntervalMs);
     const tickerProivder = new TickerProvider(bybitPublicRestClient);
     const positionCoordinatorProvider = new PositionCoordinatorProvider(bybitRestClientProvider, bybitWsClient);

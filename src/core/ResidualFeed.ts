@@ -1,14 +1,15 @@
 import EventEmitter from "events";
-import { RestClientV5, WebsocketClient } from "bybit-api";
+import { RestClientV5 } from "bybit-api";
 import Decimal from "decimal.js";
 import { TradeFeed, WSTrade } from "./TradeFeed.js";
+import { TradeFeedProvider } from "./TradeFeedProvider.js";
 
 export class ResidualFeed extends EventEmitter<{
     "update": [Decimal]
 }>
 {
-    private wsClient: WebsocketClient;
     private restClient: RestClientV5;
+    private tradeFeedProvider: TradeFeedProvider;
 
     private symbol1: string;
     private symbol2: string;
@@ -22,16 +23,16 @@ export class ResidualFeed extends EventEmitter<{
 
     private currentResidual?: Decimal;
 
-    constructor(symbol1: string, symbol2: string, slope: Decimal, wsClient: WebsocketClient, restClient: RestClientV5)
+    constructor(symbol1: string, symbol2: string, slope: Decimal, tradeFeedProvider: TradeFeedProvider, restClient: RestClientV5)
     {
         super();
-        this.wsClient = wsClient;
         this.restClient = restClient;
+        this.tradeFeedProvider = tradeFeedProvider;
         this.symbol1 = symbol1;
         this.symbol2 = symbol2;
         this.slope = slope;
-        this.symbol1TradeFeed = new TradeFeed(symbol1, this.wsClient);
-        this.symbol2TradeFeed = new TradeFeed(symbol2, this.wsClient);
+        this.symbol1TradeFeed = tradeFeedProvider.get(symbol1);
+        this.symbol2TradeFeed = tradeFeedProvider.get(symbol2);
         this.symbol1TradeFeed.on("update", this.symbol1TradeUpdate.bind(this));
         this.symbol2TradeFeed.on("update", this.symbol2TradeUpdate.bind(this));
 
@@ -42,8 +43,23 @@ export class ResidualFeed extends EventEmitter<{
     {
         this.symbol1TradeFeed.off("update", this.symbol1TradeUpdate.bind(this));
         this.symbol2TradeFeed.off("update", this.symbol2TradeUpdate.bind(this));
-        this.symbol1TradeFeed.shutdown();
-        this.symbol2TradeFeed.shutdown();
+        this.tradeFeedProvider.remove(this.symbol1TradeFeed);
+        this.tradeFeedProvider.remove(this.symbol2TradeFeed);
+    }
+
+    public get Symbol1()
+    {
+        return this.symbol1;
+    }
+
+    public get Symbol2()
+    {
+        return this.symbol2;
+    }
+
+    public get Slope()
+    {
+        return this.slope;
     }
 
     private async getInitialPrices()
