@@ -106,7 +106,7 @@ export class PositionContext extends EventEmitter<{
 
     public async add(symbol1BaseQty: Decimal, symbol1EntryPrice: Decimal, symbol2BaseQty: Decimal, symbol2EntryPrice: Decimal)
     {
-        return await this.state.add(symbol1BaseQty, symbol2BaseQty, symbol1EntryPrice, symbol2EntryPrice);
+        return await this.state.add(symbol1BaseQty, symbol1EntryPrice, symbol2BaseQty, symbol2EntryPrice);
     }
 
     public async remove(symbol1BaseQty: Decimal, symbol1EntryPrice: Decimal, symbol2BaseQty: Decimal, symbol2EntryPrice: Decimal)
