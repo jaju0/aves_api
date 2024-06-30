@@ -6,6 +6,7 @@ export class TickerFeed extends EventEmitter<{
 }>
 {
     private wsClient: WebsocketClient;
+    private symbol: string;
     private topic: string;
     private ticker?: TickerLinearInverseV5;
 
@@ -13,6 +14,7 @@ export class TickerFeed extends EventEmitter<{
     {
         super();
         this.wsClient = wsClient;
+        this.symbol = symbol;
         this.topic = `tickers.${symbol}`;
         this.wsClient.on("update", this.websocketUpdate.bind(this));
         this.wsClient.subscribeV5(this.topic, "linear");
@@ -22,6 +24,11 @@ export class TickerFeed extends EventEmitter<{
     {
         this.wsClient.unsubscribeV5(this.topic, "linear");
         this.wsClient.off("update", this.websocketUpdate.bind(this));
+    }
+
+    public get Symbol()
+    {
+        return this.symbol;
     }
 
     private websocketUpdate(response: any)

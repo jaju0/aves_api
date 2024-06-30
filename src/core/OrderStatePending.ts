@@ -35,14 +35,11 @@ export class OrderStatePending extends OrderState
             return;
         }
 
-        this.context.residualFeed = new ResidualFeed(
-            this.context.order.symbol1,
-            this.context.order.symbol2,
-            new Decimal(this.context.order.regressionSlope),
-            this.context.wsClient
-        );
-
+        if(!this.context.residualFeed)
+        {
+            this.context.residualFeed = this.context.residualFeedProvider.get(this.context.order.symbol1, this.context.order.symbol2, new Decimal(this.context.order.regressionSlope));
         this.context.residualFeed.on("update", this.context.residualUpdate.bind(this.context));
+        }
     }
 
     public async residualUpdate(residual: Decimal)

@@ -6,21 +6,24 @@ import { TickerProvider } from "./TickerProvider.js";
 import { PositionCoordinatorProvider } from "core/PositionCoordinatorProvider.js";
 import { Order } from "../models/Order.js";
 import { Credential } from "../models/Credential.js";
+import { ResidualFeedProvider } from "./ResidualFeedProvider.js";
 
 export class OrderCoordinatorProvider
 {
     private bybitRestClientProvider: BybitRestClientProvider;
     private wsClient: WebsocketClient;
+    private residualFeedProvider: ResidualFeedProvider;
     private instInfoProvider: InstrumentsInfoProvider;
     private tickerProvider: TickerProvider;
     private positionCoordinatorProvider: PositionCoordinatorProvider;
 
     private orderCoordinators: Map<string, OrderCoordinator>;
 
-    constructor(bybitRestClientProvider: BybitRestClientProvider, wsClient: WebsocketClient, instInfoProvider: InstrumentsInfoProvider, tickerProvider: TickerProvider, positionCoordinatorProvider: PositionCoordinatorProvider)
+    constructor(bybitRestClientProvider: BybitRestClientProvider, wsClient: WebsocketClient, residualFeedProvider: ResidualFeedProvider, instInfoProvider: InstrumentsInfoProvider, tickerProvider: TickerProvider, positionCoordinatorProvider: PositionCoordinatorProvider)
     {
         this.bybitRestClientProvider = bybitRestClientProvider;
         this.wsClient = wsClient;
+        this.residualFeedProvider = residualFeedProvider;
         this.instInfoProvider = instInfoProvider;
         this.tickerProvider = tickerProvider;
         this.positionCoordinatorProvider = positionCoordinatorProvider;
@@ -34,7 +37,7 @@ export class OrderCoordinatorProvider
         {
             const restClient = this.bybitRestClientProvider.get(apiKey, apiSecret, demoTrading);
             const positionCoordinator = this.positionCoordinatorProvider.get(apiKey, apiSecret, demoTrading);
-            foundOrderCoordinator = new OrderCoordinator(restClient, this.wsClient, this.instInfoProvider, this.tickerProvider, positionCoordinator);
+            foundOrderCoordinator = new OrderCoordinator(restClient, this.wsClient, this.residualFeedProvider, this.instInfoProvider, this.tickerProvider, positionCoordinator);
             this.orderCoordinators.set(apiKey, foundOrderCoordinator);
         }
 
@@ -59,7 +62,7 @@ export class OrderCoordinatorProvider
             {
                 const restClient = this.bybitRestClientProvider.get(credential.key, credential.secret, credential.demoTrading);
                 const positionCoordinator = this.positionCoordinatorProvider.get(credential.key, credential.secret, credential.demoTrading);
-                foundOrderCoordinator = new OrderCoordinator(restClient, this.wsClient, this.instInfoProvider, this.tickerProvider, positionCoordinator);
+                foundOrderCoordinator = new OrderCoordinator(restClient, this.wsClient, this.residualFeedProvider, this.instInfoProvider, this.tickerProvider, positionCoordinator);
                 this.orderCoordinators.set(credential.key, foundOrderCoordinator);
             }
         }

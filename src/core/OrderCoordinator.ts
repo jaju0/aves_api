@@ -4,6 +4,7 @@ import { InstrumentsInfoProvider } from "./InstrumentsInfoProvider.js";
 import { TickerProvider } from "./TickerProvider.js";
 import { OrderContext } from "./OrderContext.js";
 import { PositionCoordinator } from "./PositionCoordinator.js";
+import { ResidualFeedProvider } from "./ResidualFeedProvider.js";
 
 export interface OrderCreationParams
 {
@@ -26,17 +27,19 @@ export class OrderCoordinator
     private orderContexts: Map<string, OrderContext>;
     private restClient: RestClientV5;
     private wsClient: WebsocketClient;
+    private residualFeedProvider: ResidualFeedProvider;
     private instInfoProvider: InstrumentsInfoProvider;
     private tickerProvider: TickerProvider;
     private positionCoordinator: PositionCoordinator;
 
     private initPromise: Promise<void>;
 
-    constructor(restClient: RestClientV5, wsClient: WebsocketClient, instInfoProvider: InstrumentsInfoProvider, tickerProvider: TickerProvider, positionCoordinator: PositionCoordinator)
+    constructor(restClient: RestClientV5, wsClient: WebsocketClient, residualFeedProvider: ResidualFeedProvider, instInfoProvider: InstrumentsInfoProvider, tickerProvider: TickerProvider, positionCoordinator: PositionCoordinator)
     {
         this.orderContexts = new Map();
         this.restClient = restClient;
         this.wsClient = wsClient;
+        this.residualFeedProvider = residualFeedProvider;
         this.instInfoProvider = instInfoProvider;
         this.tickerProvider = tickerProvider;
         this.positionCoordinator = positionCoordinator;
@@ -53,7 +56,7 @@ export class OrderCoordinator
 
         await dbOrder.save();
 
-        const orderContext = new OrderContext(dbOrder, this.restClient, this.wsClient, this.instInfoProvider, this.tickerProvider, this.positionCoordinator);
+        const orderContext = new OrderContext(dbOrder, this.restClient, this.wsClient, this.residualFeedProvider, this.instInfoProvider, this.tickerProvider, this.positionCoordinator);
         orderContext.once("executed", this.orderExecuted.bind(this, dbOrder, orderContext));
         this.orderContexts.set(dbOrder.id, orderContext);
 
@@ -100,7 +103,7 @@ export class OrderCoordinator
 
         for(const dbOrder of dbOrders)
         {
-            const orderContext = new OrderContext(dbOrder, this.restClient, this.wsClient, this.instInfoProvider, this.tickerProvider, this.positionCoordinator);
+            const orderContext = new OrderContext(dbOrder, this.restClient, this.wsClient, this.residualFeedProvider, this.instInfoProvider, this.tickerProvider, this.positionCoordinator);
             orderContext.once("executed", this.orderExecuted.bind(this, dbOrder, orderContext));
             this.orderContexts.set(dbOrder.id, orderContext);
         }

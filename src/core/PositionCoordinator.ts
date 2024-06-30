@@ -2,6 +2,8 @@ import { RestClientV5, WebsocketClient } from "bybit-api";
 import Decimal from "decimal.js";
 import { PositionContext } from "./PositionContext.js";
 import { Position, PositionSide } from "../models/Position.js";
+import { ResidualFeedProvider } from "./ResidualFeedProvider.js";
+import { TickerFeedProvider } from "./TickerFeedProvider.js";
 
 export interface AddToPositionParams
 {
@@ -25,12 +27,16 @@ export class PositionCoordinator
 
     private restClient: RestClientV5;
     private wsClient: WebsocketClient;
+    private residualFeedProvider: ResidualFeedProvider;
+    private tickerFeedProvider: TickerFeedProvider;
 
-    constructor(restClient: RestClientV5, wsClient: WebsocketClient)
+    constructor(restClient: RestClientV5, wsClient: WebsocketClient, residualFeedProvider: ResidualFeedProvider, tickerFeedProvider: TickerFeedProvider)
     {
         this.positionContexts = new Map();
         this.restClient = restClient;
         this.wsClient = wsClient;
+        this.residualFeedProvider = residualFeedProvider;
+        this.tickerFeedProvider = tickerFeedProvider;
 
         this.initPromise = this.initialize();
     }
@@ -74,7 +80,7 @@ export class PositionCoordinator
         await dbPosition.save();
 
         const key = `${params.ownerId}-${dbPosition.symbol1}-${dbPosition.symbol2}`;
-        const positionContext = new PositionContext(dbPosition, this.restClient, this.wsClient);
+        const positionContext = new PositionContext(dbPosition, this.restClient, this.wsClient, this.residualFeedProvider, this.tickerFeedProvider);
         this.positionContexts.set(key, positionContext);
         positionContext.once("closed", this.positionExecuted.bind(this, params.ownerId, dbPosition, positionContext));
     }
@@ -103,7 +109,7 @@ export class PositionCoordinator
         for(const dbPosition of dbPositions)
         {
             const key = `${dbPosition.ownerId}-${dbPosition.symbol1}-${dbPosition.symbol2}`;
-            this.positionContexts.set(key, new PositionContext(dbPosition, this.restClient, this.wsClient));
+            this.positionContexts.set(key, new PositionContext(dbPosition, this.restClient, this.wsClient, this.residualFeedProvider, this.tickerFeedProvider));
         }
     }
 

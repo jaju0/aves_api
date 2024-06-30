@@ -9,6 +9,7 @@ import { OrderStateExecuted } from "./OrderStateExecuted.js";
 import { OrderStatePending } from "./OrderStatePending.js";
 import { ResidualFeed } from "./ResidualFeed.js";
 import { PositionCoordinator } from "./PositionCoordinator.js";
+import { ResidualFeedProvider } from "./ResidualFeedProvider.js";
 
 export class OrderContext extends EventEmitter<{
     "executed": [],
@@ -19,6 +20,7 @@ export class OrderContext extends EventEmitter<{
     public readonly order: Order;
     public readonly restClient: RestClientV5;
     public readonly wsClient: WebsocketClient;
+    public readonly residualFeedProvider: ResidualFeedProvider;
     public readonly instInfoProvider: InstrumentsInfoProvider;
     public readonly tickerProvider: TickerProvider;
     public readonly positionCoordinator: PositionCoordinator;
@@ -29,12 +31,13 @@ export class OrderContext extends EventEmitter<{
 
     private state?: OrderState;
 
-    constructor(order: Order, restClient: RestClientV5, wsClient: WebsocketClient, instInfoProvider: InstrumentsInfoProvider, tickerProvider: TickerProvider, positionCoordinator: PositionCoordinator)
+    constructor(order: Order, restClient: RestClientV5, wsClient: WebsocketClient, residualFeedProvider: ResidualFeedProvider, instInfoProvider: InstrumentsInfoProvider, tickerProvider: TickerProvider, positionCoordinator: PositionCoordinator)
     {
         super();
         this.order = order;
         this.restClient = restClient;
         this.wsClient = wsClient;
+        this.residualFeedProvider = residualFeedProvider;
         this.instInfoProvider = instInfoProvider;
         this.tickerProvider = tickerProvider;
         this.positionCoordinator = positionCoordinator;
@@ -76,8 +79,12 @@ export class OrderContext extends EventEmitter<{
 
     public async shutdown()
     {
-        this.residualFeed?.off("update", this.residualUpdate.bind(this));
-        this.residualFeed?.shutdown();
+        if(this.residualFeed)
+        {
+            this.residualFeed.off("update", this.residualUpdate.bind(this));
+            this.residualFeedProvider.remove(this.residualFeed);
+            this.residualFeed = undefined;
+        }
     }
 
     public async transitionTo(state: OrderState)

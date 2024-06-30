@@ -7,6 +7,8 @@ import { RestClientV5, WebsocketClient } from "bybit-api";
 import expressWs from "express-ws";
 import { User } from "./models/User.js";
 import { TradeFeedProvider } from "./core/TradeFeedProvider.js";
+import { ResidualFeedProvider } from "./core/ResidualFeedProvider.js";
+import { TickerFeedProvider } from "./core/TickerFeedProvider.js";
 import { OrderCoordinatorProvider } from "./core/OrderCoordinatorProvider.js";
 import { BybitRestClientProvider } from "./core/BybitRestClientProvider.js";
 import { InstrumentsInfoProvider } from "./core/InstrumentsInfoProvider.js";
@@ -45,10 +47,12 @@ async function main()
 
     const bybitRestClientProvider = new BybitRestClientProvider();
     const tradeFeedProvider = new TradeFeedProvider(bybitWsClient);
+    const residualFeedProvider = new ResidualFeedProvider(tradeFeedProvider, bybitPublicRestClient);
+    const tickerFeedProvider = new TickerFeedProvider(bybitWsClient);
     const instInfoProvider = new InstrumentsInfoProvider(bybitPublicRestClient, instrumentsInfoRefetchIntervalMs);
     const tickerProivder = new TickerProvider(bybitPublicRestClient);
-    const positionCoordinatorProvider = new PositionCoordinatorProvider(bybitRestClientProvider, bybitWsClient);
-    const orderCoordinatorProvider = new OrderCoordinatorProvider(bybitRestClientProvider, bybitWsClient, instInfoProvider, tickerProivder, positionCoordinatorProvider);
+    const positionCoordinatorProvider = new PositionCoordinatorProvider(bybitRestClientProvider, bybitWsClient, residualFeedProvider, tickerFeedProvider);
+    const orderCoordinatorProvider = new OrderCoordinatorProvider(bybitRestClientProvider, bybitWsClient, residualFeedProvider, instInfoProvider, tickerProivder, positionCoordinatorProvider);
     const websocketAgentProvider = new WebsocketAgentProvider();
 
     await mongoose.connect(`mongodb://mongodb:${config.MONGODB_PORT}/${config.MONGODB_DB_NAME}`, {

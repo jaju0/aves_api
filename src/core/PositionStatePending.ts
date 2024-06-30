@@ -3,8 +3,6 @@ import config from "../config.js";
 import { PositionContext } from "./PositionContext.js";
 import { PositionState } from "./PositionState.js";
 import { PositionStateClosed } from "./PositionStateClosed.js";
-import { ResidualFeed } from "./ResidualFeed.js";
-import { TickerFeed } from "./TickerFeed.js";
 import { PnlFeed } from "./PnlFeed.js";
 
 export class PositionStatePending extends PositionState
@@ -20,22 +18,15 @@ export class PositionStatePending extends PositionState
 
         if(!this.context.residualFeed)
         {
-            this.context.residualFeed = new ResidualFeed(
-                this.context.position.symbol1,
-                this.context.position.symbol2,
-                new Decimal(this.context.position.regressionSlope),
-                this.context.wsClient,
-                this.context.restClient
-            );
-
+            this.context.residualFeed = this.context.residualFeedProvider.get(this.context.position.symbol1, this.context.position.symbol2, new Decimal(this.context.position.regressionSlope));
             this.context.residualFeed.on("update", this.context.residualUpdate.bind(this.context));
         }
 
         if(!this.context.symbol1TickerFeed)
-            this.context.symbol1TickerFeed = new TickerFeed(this.context.position.symbol1, this.context.wsClient);
+            this.context.symbol1TickerFeed = this.context.tickerFeedProvider.get(this.context.position.symbol1);
         
         if(!this.context.symbol2TickerFeed)
-            this.context.symbol2TickerFeed = new TickerFeed(this.context.position.symbol2, this.context.wsClient);
+            this.context.symbol2TickerFeed = this.context.tickerFeedProvider.get(this.context.position.symbol2);
 
         if(!this.context.pnlFeed)
         {

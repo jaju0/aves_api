@@ -5,6 +5,8 @@ import { Position } from "../models/Position.js";
 import { PositionState } from "./PositionState.js";
 import { PositionStatePending } from "./PositionStatePending.js";
 import { PositionStateClosed } from "./PositionStateClosed.js";
+import { ResidualFeedProvider } from "./ResidualFeedProvider.js";
+import { TickerFeedProvider } from "./TickerFeedProvider.js";
 import { ResidualFeed } from "./ResidualFeed.js";
 import { PnlFeed } from "./PnlFeed.js";
 import { TickerFeed } from "./TickerFeed.js";
@@ -16,6 +18,8 @@ export class PositionContext extends EventEmitter<{
     public readonly position: Position;
     public readonly restClient: RestClientV5;
     public readonly wsClient: WebsocketClient;
+    public readonly residualFeedProvider: ResidualFeedProvider;
+    public readonly tickerFeedProvider: TickerFeedProvider;
     public residualFeed?: ResidualFeed;
     public symbol1TickerFeed?: TickerFeed;
     public symbol2TickerFeed?: TickerFeed;
@@ -23,12 +27,14 @@ export class PositionContext extends EventEmitter<{
 
     private state: PositionState;
 
-    constructor(position: Position, restClient: RestClientV5, wsClient: WebsocketClient)
+    constructor(position: Position, restClient: RestClientV5, wsClient: WebsocketClient, residualFeedProvider: ResidualFeedProvider, tickerFeedProvider: TickerFeedProvider)
     {
         super();
         this.position = position;
         this.restClient = restClient;
         this.wsClient = wsClient;
+        this.residualFeedProvider = residualFeedProvider;
+        this.tickerFeedProvider = tickerFeedProvider;
 
         if(this.position.open)
             this.state = new PositionStatePending(this);
@@ -42,15 +48,25 @@ export class PositionContext extends EventEmitter<{
         this.pnlFeed?.shutdown();
         this.pnlFeed = undefined;
 
-        this.symbol1TickerFeed?.shutdown();
+        if(this.symbol1TickerFeed)
+        {
+            this.tickerFeedProvider.remove(this.symbol1TickerFeed);
         this.symbol1TickerFeed = undefined;
+        }
 
-        this.symbol2TickerFeed?.shutdown(),
-        this.symbol1TickerFeed = undefined;
+        if(this.symbol2TickerFeed)
+        {
+            this.tickerFeedProvider.remove(this.symbol2TickerFeed);
+            this.symbol2TickerFeed = undefined;
+        }
 
-        this.residualFeed?.off("update", this.residualUpdate.bind(this));
-        this.residualFeed?.shutdown();
+        if(this.residualFeed)
+        {
+            this.residualFeed.off("update", this.residualUpdate.bind(this));
+            this.residualFeedProvider.remove(this.residualFeed);
         this.residualFeed = undefined;
+        }
+    }
 
     public async amendExitOrders(exitOrders: { takeProfit?: string | null, stopLoss?: string | null })
     {

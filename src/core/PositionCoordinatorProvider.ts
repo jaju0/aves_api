@@ -3,18 +3,24 @@ import { BybitRestClientProvider } from "./BybitRestClientProvider.js";
 import { PositionCoordinator } from "./PositionCoordinator.js";
 import { Position } from "../models/Position.js";
 import { Credential } from "../models/Credential.js";
+import { ResidualFeedProvider } from "./ResidualFeedProvider.js";
+import { TickerFeedProvider } from "./TickerFeedProvider.js";
 
 export class PositionCoordinatorProvider
 {
     private bybitRestClientProvider: BybitRestClientProvider;
     private wsClient: WebsocketClient;
+    private residualFeedProvider: ResidualFeedProvider;
+    private tickerFeedProvider: TickerFeedProvider;
 
     private positionCoordinators: Map<string, PositionCoordinator>;
 
-    constructor(bybitRestClientProvider: BybitRestClientProvider, wsClient: WebsocketClient)
+    constructor(bybitRestClientProvider: BybitRestClientProvider, wsClient: WebsocketClient, resiualFeedProvider: ResidualFeedProvider, tickerFeedProvider: TickerFeedProvider)
     {
         this.bybitRestClientProvider = bybitRestClientProvider;
         this.wsClient = wsClient;
+        this.residualFeedProvider = resiualFeedProvider;
+        this.tickerFeedProvider = tickerFeedProvider;
         this.positionCoordinators = new Map();
     }
 
@@ -24,7 +30,7 @@ export class PositionCoordinatorProvider
         if(foundPositionCoordinator === undefined)
         {
             const restClient = this.bybitRestClientProvider.get(apiKey, apiSecret, demoTrading);
-            foundPositionCoordinator = new PositionCoordinator(restClient, this.wsClient);
+            foundPositionCoordinator = new PositionCoordinator(restClient, this.wsClient, this.residualFeedProvider, this.tickerFeedProvider);
             this.positionCoordinators.set(apiKey, foundPositionCoordinator);
         }
 
@@ -46,7 +52,7 @@ export class PositionCoordinatorProvider
             if(foundPositionCoordinator === undefined)
             {
                 const restClient = this.bybitRestClientProvider.get(credential.key, credential.secret, credential.demoTrading);
-                foundPositionCoordinator = new PositionCoordinator(restClient, this.wsClient);
+                foundPositionCoordinator = new PositionCoordinator(restClient, this.wsClient, this.residualFeedProvider, this.tickerFeedProvider);
                 this.positionCoordinators.set(credential.key, foundPositionCoordinator);
             }
         }
