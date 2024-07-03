@@ -51,9 +51,10 @@ export class OrderContext extends EventEmitter<{
         this.transitionTo(new OrderStatePending(this));
     }
 
-    public async amendEntryResidual(entryResidual: number)
+    public async amendEntryPrices(symbol1EntryPrice: number, symbol2EntryPrice: number)
     {
-        this.order.entryResidual = entryResidual.toString();
+        this.order.symbol1EntryPrice = symbol1EntryPrice.toString();
+        this.order.symbol2EntryPrice = symbol2EntryPrice.toString();
         await this.order.save();
     }
 

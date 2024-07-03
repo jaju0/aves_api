@@ -12,7 +12,8 @@ export const submitOrder = Joi.object({
     symbol1: Joi.string().required(),
     symbol2: Joi.string().required(),
     regressionSlope: Joi.number().required(),
-    entryResidual: Joi.number().optional(), // TODO: required if type if Limit or Stop
+    symbol1EntryPrice: Joi.number().optional(), // TODO: required if type if Limit or Stop
+    symbol2EntryPrice: Joi.number().optional(), // TODO: required if type if Limit or Stop
     takeProfit: Joi.number().optional(),
     stopLoss: Joi.number().optional(),
     quoteQty: Joi.number().optional(), // TODO: this must exist if baseQty is undefined
@@ -21,7 +22,10 @@ export const submitOrder = Joi.object({
 
 export const amendOrder = Joi.object({
     orderId: Joi.string().required(),
-    entryResidual: Joi.number().required(),
+    symbol1EntryPrice: Joi.number().optional(), // TODO: this must exist if symbol2EntryPrice is defined
+    symbol2EntryPrice: Joi.number().optional(), // TODO: this must exist if symbol1EntryPrice is defined
+    takeProfit: [Joi.number().optional(), Joi.allow(null)],
+    stopLoss: [Joi.number().optional(), Joi.allow(null)],
 });
 
 export const cancelOrder = Joi.object({

@@ -13,7 +13,8 @@ export interface OrderEventData
     symbol1BaseQty: string;
     symbol2BaseQty: string;
     quoteQty?: string;
-    entryResidual?: string;
+    symbol1EntryPrice?: string;
+    symbol2EntryPrice?: string;
     regressionSlope: string;
     takeProfit?: string;
     stopLoss?: string;
@@ -50,7 +51,8 @@ export function orderModelToEventData(order: Order)
         symbol1BaseQty: order.symbol1BaseQty,
         symbol2BaseQty: order.symbol2BaseQty,
         quoteQty: order.quoteQty,
-        entryResidual: order.entryResidual,
+        symbol1EntryPrice: order.symbol1EntryPrice,
+        symbol2EntryPrice: order.symbol2EntryPrice,
         regressionSlope: order.regressionSlope,
         takeProfit: order.takeProfit,
         stopLoss: order.stopLoss,

@@ -30,7 +30,7 @@ export class OrderStatePending extends OrderState
         else if(this.context.order.type === "Stop")
             this.triggerDirection = this.context.order.side === "Buy" ? "FromBottom" : "FromTop";
 
-        if(this.context.order.entryResidual === undefined)
+        if(this.context.order.symbol1EntryPrice === undefined || this.context.order.symbol2EntryPrice === undefined)
         {
             this.context.transitionTo(new OrderStateFailed(this.context));
             return;
@@ -48,16 +48,17 @@ export class OrderStatePending extends OrderState
         if(this.isTriggered)
             return;
 
-        if(this.context.order.entryResidual === undefined)
+        if(this.context.order.symbol1EntryPrice === undefined || this.context.order.symbol2EntryPrice === undefined)
         {
             this.isTriggered = true;
             this.context.transitionTo(new OrderStateFailed(this.context));
             return;
         }
 
-        const entryResidual = +this.context.order.entryResidual;
-        if(entryResidual === undefined)
-            return;
+        const slope = +this.context.order.regressionSlope;
+        const symbol1EntryPrice = +this.context.order.symbol1EntryPrice;
+        const symbol2EntryPrice = +this.context.order.symbol2EntryPrice;
+        const entryResidual = symbol1EntryPrice - slope * symbol2EntryPrice;
 
         const fromBottomTriggered = this.triggerDirection === "FromBottom" && residual.greaterThan(entryResidual);
         const fromTopTriggered = this.triggerDirection === "FromTop" && residual.lessThan(entryResidual);

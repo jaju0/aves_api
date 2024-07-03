@@ -79,13 +79,36 @@ export class OrderStateExecute extends OrderState
             return;
         }
 
+        const symbol1OrderResponse = await this.context.restClient.getActiveOrders({
+            category: "linear",
+            orderId: symbol1SubmitionResponse.result.orderId,
+        });
+
+        const symbol2OrderResponse = await this.context.restClient.getActiveOrders({
+            category: "linear",
+            orderId: symbol2SubmitionResponse.result.orderId,
+        });
+
+        if(
+            symbol1SubmitionResponse === undefined || symbol1SubmitionResponse.retCode !== 0 ||
+            symbol2SubmitionResponse === undefined || symbol2SubmitionResponse.retCode !== 0
+        )
+        {
+            await this.context.transitionTo(new OrderStateFailed(this.context));
+            return;
+        }
+
+        const symbol1Order = symbol1OrderResponse.result.list[0];
+        const symbol2Order = symbol2OrderResponse.result.list[0];
+
         this.context.symbol1OrderId = symbol1SubmitionResponse.result.orderId;
         this.context.symbol2OrderId = symbol2SubmitionResponse.result.orderId;
 
         this.context.order.status = "Execute";
         this.context.order.symbol1BaseQty = roundedContractSizes.symbol1ContractSize.toString();
         this.context.order.symbol2BaseQty = roundedContractSizes.symbol2ContractSize.toString();
-        this.context.order.entryResidual = this.context.residualFeed?.CurrentResidual?.toString();
+        this.context.order.symbol1EntryPrice = symbol1Order.avgPrice === "" || symbol1Order.avgPrice === "0" ? symbol1Order.price : symbol1Order.avgPrice;
+        this.context.order.symbol2EntryPrice = symbol2Order.avgPrice === "" || symbol2Order.avgPrice === "0" ? symbol2Order.price : symbol2Order.avgPrice;
         await this.context.order.save();
 
         await this.context.transitionTo(new OrderStateExecuted(this.context));

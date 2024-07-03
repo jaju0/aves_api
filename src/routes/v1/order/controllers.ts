@@ -21,7 +21,8 @@ export interface OrderData
     symbol1BaseQty: string;
     symbol2BaseQty: string;
     quoteQty?: string;
-    entryResidual?: string;
+    symbol1EntryPrice?: string;
+    symbol2EntryPrice?: string;
     regressionSlope: string;
     takeProfit?: string;
     stopLoss?: string;
@@ -34,7 +35,8 @@ export interface OrderSubmitionRequest
     symbol1: string;
     symbol2: string;
     regressionSlope: number;
-    entryResidual?: number;
+    symbol1EntryPrice?: string;
+    symbol2EntryPrice?: string;
     takeProfit?: number;
     stopLoss?: number;
     quoteQty?: number;
@@ -49,7 +51,8 @@ export interface OrderSubmitionResponse
 export interface OrderAmendmentRequest
 {
     orderId: string;
-    entryResidual?: number;
+    symbol1EntryPrice?: string;
+    symbol2EntryPrice?: string;
     takeProfit?: string | null;
     stopLoss?: string | null;
 }
@@ -74,7 +77,8 @@ function orderDocumentToResponseData(order: Order)
         symbol1BaseQty: order.symbol1BaseQty,
         symbol2BaseQty: order.symbol2BaseQty,
         quoteQty: order.quoteQty,
-        entryResidual: order.entryResidual,
+        symbol1EntryPrice: order.symbol1EntryPrice,
+        symbol2EntryPrice: order.symbol2EntryPrice,
         regressionSlope: order.regressionSlope,
         takeProfit: order.takeProfit,
         stopLoss: order.stopLoss,
@@ -103,7 +107,8 @@ export async function orderSubmitionHandler(orderCoordinatorProvider: OrderCoord
         symbol1: req.body.symbol1,
         symbol2: req.body.symbol2,
         regressionSlope: req.body.regressionSlope.toString(),
-        entryResidual: req.body.entryResidual?.toString(),
+        symbol1EntryPrice: req.body.symbol1EntryPrice?.toString(),
+        symbol2EntryPrice: req.body.symbol2EntryPrice?.toString(),
         takeProfit: req.body.takeProfit?.toString(),
         stopLoss: req.body.stopLoss?.toString(),
         symbol1BaseQty: req.body.baseQty?.symbol1BaseQty.toString(),
@@ -134,8 +139,8 @@ export async function orderAmendmentHandler(orderCoordinatorProvider: OrderCoord
     if(orderData === undefined)
         return res.sendStatus(404);
 
-    if(data.entryResidual !== undefined)
-        orderData.amendEntryResidual(data.entryResidual);
+    if(data.symbol1EntryPrice !== undefined && data.symbol2EntryPrice !== undefined)
+        orderData.amendEntryPrices(+data.symbol1EntryPrice, +data.symbol2EntryPrice);
     if(data.takeProfit !== undefined || data.stopLoss !== undefined)
         orderData.amendExitOrders({ takeProfit: data.takeProfit, stopLoss: data.stopLoss });
 

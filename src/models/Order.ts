@@ -22,7 +22,8 @@ export interface IOrder extends mongoose.Document
     symbol1BaseQty: string;
     symbol2BaseQty: string;
     quoteQty?: string;
-    entryResidual?: string;
+    symbol1EntryPrice?: string;
+    symbol2EntryPrice?: string;
     regressionSlope: string;
     takeProfit?: string;
     stopLoss?: string;
@@ -40,7 +41,8 @@ const orderSchema = new mongoose.Schema<IOrder, OrderModel>({
     symbol1BaseQty: { type: String, required: true, default: "0" },
     symbol2BaseQty: { type: String, required: true, default: "0" },
     quoteQty: { type: String, required: false },
-    entryResidual: { type: String, required: false },
+    symbol1EntryPrice: { type: String, required: false },
+    symbol2EntryPrice: { type: String, required: false },
     regressionSlope: { type: String, required: true },
     takeProfit: { type: String, required: false },
     stopLoss: { type: String, required: false },

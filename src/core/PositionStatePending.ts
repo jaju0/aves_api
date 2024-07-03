@@ -41,8 +41,13 @@ export class PositionStatePending extends PositionState
 
     public async residualUpdate(residual: Decimal)
     {
-        const stopLoss = this.context.position.stopLoss === undefined ? undefined : new Decimal(this.context.position.stopLoss);
-        const takeProfit = this.context.position.takeProfit === undefined ? undefined : new Decimal(this.context.position.takeProfit);
+        const symbol1EntryPrice = new Decimal(this.context.position.symbol1EntryPrice);
+        const symbol2EntryPrice = new Decimal(this.context.position.symbol2EntryPrice);
+        const slope = new Decimal(this.context.position.regressionSlope);
+        const entryResidual = symbol1EntryPrice.minus(slope.times(symbol2EntryPrice));
+
+        const stopLoss = this.context.position.stopLoss === undefined ? undefined : entryResidual.plus(this.context.position.stopLoss);
+        const takeProfit = this.context.position.takeProfit === undefined ? undefined : entryResidual.plus(this.context.position.takeProfit);
 
         if(this.context.position.side === "Long")
         {
