@@ -242,24 +242,30 @@ Expect a message of the follwing kind at any time after subscribing to the order
 Example:
 ```json
 {
-  "ownerId": "6647d82feee6930865e2de27",
-  "status": "Pending",
-  "type": "Limit",
-  "side": "Buy",
-  "symbol1": "BTCUSDT",
-  "symbol2": "ETHUSDT",
-  "symbol1BaseQty": "0.001",
-  "symbol2BaseQty": "0.01",
-  "quoteQty": "100",
-  "entryResidual": "-0.023",
-  "regressionSlope": "10.23",
-  "takeProfit": "0.1",
-  "stopLoss": "-0.01"
+  "topic": "order",
+  "data": {
+    "id": "666eb16fb06d278b7a2dcac4",
+    "ownerId": "6647d82feee6930865e2de27",
+    "status": "Pending",
+    "type": "Limit",
+    "side": "Buy",
+    "symbol1": "BTCUSDT",
+    "symbol2": "ETHUSDT",
+    "symbol1BaseQty": "0.001",
+    "symbol2BaseQty": "0.01",
+    "quoteQty": "100",
+    "symbol1EntryPrice": "60342.23",
+    "symbol2EntryPrice": "3034.33",
+    "regressionSlope": "10.23",
+    "takeProfit": "0.1",
+    "stopLoss": "-0.01"
+  }
 }
 ```
 
 | property | type | description |
 |:---|:---|:---|
+| id | `string` (ObjectId) | The order's ID. |
 | ownerId | `string` (ObjectId) | Id of the user the order belongs to. |
 | status | `string` ("New", "Pending", "Execute", "Executed", "Failed") | Status of the order |
 | type | `string` ("Market", "Limit", "Stop") | Type of the order. |
@@ -269,7 +275,8 @@ Example:
 | symbol1BaseQty | `string` (decimal) | Base quantity of the order of the first instrument. |
 | symbol2BaseQty | `string` (decimal) | Base quantity of the order of the second instrument. |
 | quoteQty | `string` (decimal) or `undefined` | Quote quantity used for the orders. |
-| entryResidual | `string` (decimal) or `undefined` | Residual trigger threshold for the calculated residuals $\epsilon$. The order will be executed if it reached the threshold. Only for Limit and Stop orders. |
+| symbol1EntryPrice | `string` (decimal) or `undefined` | Entry price of the first symbol. Only for Limit and Stop orders. |
+| symbol2EntryPrice | `string` (decimal) or `undefined` | Entry price of the second symbol. Only for Limit and Stop orders. |
 | regressionSlope | `string` (decimal) | Regression slope $\beta$ for calculating the residuals $\epsilon$. |
 | takeProfit | `string` (decimal) or `undefined` | Take profit residual threshold. Position will be closed after reaching the take profit residual threshold |
 | stopLoss | `string` (decimal) or `undefined` | Stop loss residual threshold. Position will be closed after reaching the stop loss threshold. |
@@ -281,23 +288,28 @@ Expect a message of the follwing kind at any time after subscribing to the posit
 Example:
 ```json
 {
-  "ownerId": "6647d82feee6930865e2de27",
-  "side": "Buy",
-  "symbol1": "BTCUSDT",
-  "symbol2": "ETHUSDT",
-  "symbol1EntryPrice": "60342.23",
-  "symbol2EntryPrice": "3034.33",
-  "symbol1BaseQty": "0.001",
-  "symbol2BaseQty": "0.01",
-  "lastPnl": "0.32",
-  "regressionSlope": "10.23",
-  "takeProfit": "0.1",
-  "stopLoss": "-0.01"
+  "topic": "position",
+  "data": {
+    "id": "666eb19e0bf0103c8a436362",
+    "ownerId": "6647d82feee6930865e2de27",
+    "side": "Buy",
+    "symbol1": "BTCUSDT",
+    "symbol2": "ETHUSDT",
+    "symbol1EntryPrice": "60342.23",
+    "symbol2EntryPrice": "3034.33",
+    "symbol1BaseQty": "0.001",
+    "symbol2BaseQty": "0.01",
+    "lastPnl": "0.32",
+    "regressionSlope": "10.23",
+    "takeProfit": "0.1",
+    "stopLoss": "-0.01"
+  }
 }
 ```
 
 | property | type | description |
 |:---|:---|:---|
+| id | `string` (ObjectId) | The position's ID. |
 | ownerId | `string` (ObjectId) | Id of the user the position belongs to. |
 | side | `string` ("Buy", "Sell") | Side of the position. |
 | symbol1 | `string` | Instruments symbol of the first market ($Y$) |
