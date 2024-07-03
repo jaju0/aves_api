@@ -2,8 +2,8 @@ import Joi from "joi";
 import { orderSide, orderType } from "../../../models/Order.js";
 
 export const baseQtySchema = Joi.object({
-    symbol1BaseQty: Joi.string().required(),
-    symbol2BaseQty: Joi.string().required(),
+    symbol1BaseQty: Joi.number().required(),
+    symbol2BaseQty: Joi.number().required(),
 });
 
 export const submitOrder = Joi.object({
@@ -17,7 +17,7 @@ export const submitOrder = Joi.object({
     takeProfit: Joi.number().optional(),
     stopLoss: Joi.number().optional(),
     quoteQty: Joi.number().optional(), // TODO: this must exist if baseQty is undefined
-    baseQty: Joi.number().optional(), // TODO: this must exist if quoteQty is undefined
+    baseQty: baseQtySchema.optional(), // TODO: this must exist if quoteQty is undefined
 });
 
 export const amendOrder = Joi.object({
