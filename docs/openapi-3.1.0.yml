@@ -543,7 +543,9 @@ components:
           example: ETHUSDT
         regressionSlope:
           type: number
-        entryResidual:
+        symbol1EntryPrice:
+          type: number
+        symbol2EntryPrice:
           type: number
         takeProfit:
           type: number
@@ -565,7 +567,13 @@ components:
         orderId:
           type: string
           example: 6647d82feee6930865e2de27
-        entryResidual:
+        symbol1EntryPrice:
+          type: number
+        symbol2EntryPrice:
+          type: number
+        takeProfit:
+          type: number
+        stopLoss:
           type: number
     OrderCancelationRequest:
       type: object
@@ -607,9 +615,10 @@ components:
         quoteQty:
           type: string
           example: 100
-        entryResidual:
+        symbol1EntryPrice:
           type: string
-          example: 0.0238
+        symbol2EntryPrice:
+          type: string
         regressionSlope:
           type: string
           example: 10.23
