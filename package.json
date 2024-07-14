@@ -30,6 +30,7 @@
     "vitest": "^1.5.0"
   },
   "dependencies": {
+    "axios": "^1.7.2",
     "bybit-api": "^3.10.1",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",

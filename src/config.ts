@@ -23,6 +23,8 @@ declare global
             POSITION_PNL_UPDATE_INTERVAL_MS: string;
             INITIAL_ADMIN_EMAIL_ADDRESS: string;
             PAIR_EXPIRATION_HOURS?: string;
+            PAIR_FINDER_API_URL: string;
+            PAIRS_SELECTION_LIMIT?: string;
         }
     }
 }
@@ -45,6 +47,8 @@ const config = {
     POSITION_PNL_UPDATE_INTERVAL_MS: process.env.POSITION_PNL_UPDATE_INTERVAL_MS === undefined ? 5000 : +process.env.POSITION_PNL_UPDATE_INTERVAL_MS,
     INITIAL_ADMIN_EMAIL_ADDRESS: process.env.INITIAL_ADMIN_EMAIL_ADDRESS,
     PAIR_EXPIRATION_HOURS: process.env.PAIR_EXPIRATION_HOURS ?? "24",
+    PAIR_FINDER_API_URL: process.env.PAIR_FINDER_API_URL,
+    PAIRS_SELECTION_LIMIT: process.env.PAIRS_SELECTION_LIMIT ?? "1000",
 };
 
 if(config.SESSION_SECRET === undefined)
@@ -61,5 +65,8 @@ if(config.GOOGLE_OAUTH_CLIENT_ID === undefined)
 
 if(config.INITIAL_ADMIN_EMAIL_ADDRESS === undefined)
     throw new Error("environment variable INITIAL_ADMIN_EMAIL_ADDRESS is undefined");
+
+if(config.PAIR_FINDER_API_URL === undefined)
+    throw new Error("environment variable PAIR_FINDER_API_URL is undefined");
 
 export default config;

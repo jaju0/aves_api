@@ -444,6 +444,62 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ValidationErrorResponse"
+  /pair-finder/pairs:
+    get:
+      description: |
+        Get recent pairs sorted by date in descending order (newest first).
+      tags:
+        - Pair Finder
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PairData"
+        "401":
+          description: "Unauthorized"
+  /pair-finder/status:
+    get:
+      description: |
+        Get current status of pair finder.
+      tags:
+        - Pair Finder
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StatusResponse"
+  /pair-finder/start:
+    post:
+      description: |
+        Start the pair finder if it is not currently running.
+      tags:
+        - Pair Finder
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StatusResponse"
+  /pair-finder/stop:
+    post:
+      description: |
+        Stop the pair finder if it is currently running.
+      tags:
+        - Pair Finder
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StatusResponse"
 components:
   schemas:
     ValidationDetail:
@@ -721,3 +777,29 @@ components:
         rank:
           type: string
           enum: [ADMIN, USER, NONE]
+    PairData:
+      type: object
+      properties:
+        id:
+          type: string
+        created_at:
+          type: string
+        symbol1:
+          type: string
+        symbol2:
+          type: string
+        interval:
+          type: string
+        slope:
+          type: number
+        tstat:
+          type: number
+        lag:
+          type: number
+        half_life:
+          type: number
+    StatusResponse:
+      type: object
+      properties:
+        isRunning:
+          type: boolean
