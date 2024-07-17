@@ -14,6 +14,7 @@ export class PositionStateClosed extends PositionState
     public async initialize()
     {
         this.context.position.open = false;
+        this.context.position.deletion_date = new Date();
         await this.context.position.save();
         await this.context.shutdown();
         this.context.emit("closed");

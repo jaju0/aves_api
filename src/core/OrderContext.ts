@@ -95,6 +95,47 @@ export class OrderContext extends EventEmitter<{
         this.emit("state_changed", this.state);
     }
 
+    public async setDocumentExpiration(save=false)
+    {
+        switch(this.order.status)
+        {
+            case "New":
+                this.order.new_status_expiration_date = new Date();
+                this.order.failed_status_expiration_date = null;
+                this.order.executing_status_expiration_date = null;
+                this.order.executed_status_expiration_date = null;
+                break;
+            case "Failed":
+                this.order.new_status_expiration_date = null;
+                this.order.failed_status_expiration_date = new Date();
+                this.order.executing_status_expiration_date = null;
+                this.order.executed_status_expiration_date = null;
+                break;
+            case "Execute":
+                this.order.new_status_expiration_date = null;
+                this.order.failed_status_expiration_date = null;
+                this.order.executing_status_expiration_date = new Date();
+                this.order.executed_status_expiration_date = null;
+                break;
+            case "Executed":
+                this.order.new_status_expiration_date = null;
+                this.order.failed_status_expiration_date = null;
+                this.order.executing_status_expiration_date = null;
+                this.order.executed_status_expiration_date = new Date();
+                break;
+            case "Pending":
+                this.order.new_status_expiration_date = null;
+                this.order.failed_status_expiration_date = null;
+                this.order.executing_status_expiration_date = null;
+                this.order.executed_status_expiration_date = null;
+                break;
+            default:
+        }
+
+        if(save)
+            await this.order.save();
+    }
+
     public residualUpdate(residual: Decimal)
     {
         this.state?.residualUpdate(residual);

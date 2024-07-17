@@ -1,11 +1,14 @@
 import mongoose, { Model } from "mongoose";
 import PubSub from "pubsub-js";
 import { positionModelToEventData } from "../utils/events.js";
+import config from "../config.js";
 
 export type PositionSide = "None" | "Long" | "Short";
 
 export interface IPosition extends mongoose.Document
 {
+    created_at: Date;
+    deletion_date: Date | null;
     ownerId: string;
     side: PositionSide;
     symbol1: string;
@@ -24,6 +27,8 @@ export interface IPosition extends mongoose.Document
 type PositionModel = Model<IPosition>;
 
 const positionSchema = new mongoose.Schema<IPosition, PositionModel>({
+    created_at: { type: Date, default: Date.now },
+    deletion_date: { type: Date, expires: +config.CLOSED_POSITION_EXPIRATION_TIME_HOURS * 60 * 60 * 1000, default: null },
     ownerId: { type: String, required: true },
     side: { type: String, required: true },
     symbol1: { type: String, required: true },

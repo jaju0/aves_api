@@ -36,6 +36,7 @@ export class OrderStateExecuted extends OrderState
         });
 
         this.context.order.status = "Executed";
+        this.context.setDocumentExpiration();
         await this.context.order.save();
 
         this.context.emit("executed");

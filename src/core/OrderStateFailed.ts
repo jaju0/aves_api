@@ -13,6 +13,7 @@ export class OrderStateFailed extends OrderState
     {
 
         this.context.order.status = "Failed";
+        this.context.setDocumentExpiration();
         await this.context.order.save();
 
         this.context.emit("failed");

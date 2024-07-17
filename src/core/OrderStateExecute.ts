@@ -109,6 +109,7 @@ export class OrderStateExecute extends OrderState
         this.context.order.symbol2BaseQty = roundedContractSizes.symbol2ContractSize.toString();
         this.context.order.symbol1EntryPrice = symbol1Order.avgPrice === "" || symbol1Order.avgPrice === "0" ? symbol1Order.price : symbol1Order.avgPrice;
         this.context.order.symbol2EntryPrice = symbol2Order.avgPrice === "" || symbol2Order.avgPrice === "0" ? symbol2Order.price : symbol2Order.avgPrice;
+        this.context.setDocumentExpiration();
         await this.context.order.save();
 
         await this.context.transitionTo(new OrderStateExecuted(this.context));

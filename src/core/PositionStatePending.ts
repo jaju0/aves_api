@@ -39,6 +39,8 @@ export class PositionStatePending extends PositionState
 
     public async initialize()
     {
+        this.context.position.deletion_date = null;
+        await this.context.position.save();
     }
 
     public async residualUpdate(residual: Decimal)

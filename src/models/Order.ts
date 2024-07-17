@@ -1,6 +1,7 @@
 import mongoose, { Model } from "mongoose";
 import PubSub from "pubsub-js";
 import { orderModelToEventData } from "../utils/events.js";
+import config from "../config.js";
 
 export const orderType = ["Market", "Limit", "Stop"] as const;
 export type OrderType = typeof orderType[number];
@@ -13,6 +14,11 @@ export type OrderStatus = typeof orderStatus[number];
 
 export interface IOrder extends mongoose.Document
 {
+    created_at: Date;
+    new_status_expiration_date: Date | null;
+    failed_status_expiration_date: Date | null;
+    executing_status_expiration_date: Date | null;
+    executed_status_expiration_date: Date | null;
     ownerId: string;
     status: OrderStatus;
     type: OrderType;
@@ -32,6 +38,11 @@ export interface IOrder extends mongoose.Document
 type OrderModel = Model<IOrder>;
 
 const orderSchema = new mongoose.Schema<IOrder, OrderModel>({
+    created_at: { type: Date, default: Date.now },
+    new_status_expiration_date: { type: Date, expires: +config.NEW_ORDER_EXPIRATION_TIME_HOURS * 60 * 60 * 1000, default: null },
+    failed_status_expiration_date: { type: Date, expires: +config.FAILED_ORDER_EXPIRATION_TIME_HOURS * 60 * 60 * 1000, default: null },
+    executing_status_expiration_date: { type: Date, expires: +config.EXECUTING_ORDER_EXPIRATION_TIME_HOURS * 60 * 60 * 1000, default: null },
+    executed_status_expiration_date: { type: Date, expires: +config.EXECUTED_ORDER_EXPIRATION_TIME_HOURS * 60 * 60 * 1000, default: null },
     ownerId: { type: String, required: true },
     status: { type: String, required: true, default: "New" },
     type: { type: String, required: true },

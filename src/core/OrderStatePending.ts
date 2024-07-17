@@ -44,6 +44,10 @@ export class OrderStatePending extends OrderState
             this.context.residualFeed = this.context.residualFeedProvider.get(this.context.order.symbol1, this.context.order.symbol2, new Decimal(this.context.order.regressionSlope));
             this.context.residualFeed.on("update", this.context.residualUpdate.bind(this.context));
         }
+
+        this.context.order.status = "Pending";
+        this.context.setDocumentExpiration();
+        await this.context.order.save();
     }
 
     public async residualUpdate(residual: Decimal)
