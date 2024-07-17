@@ -25,6 +25,7 @@ declare global
             PAIR_EXPIRATION_HOURS?: string;
             PAIR_FINDER_API_URL: string;
             PAIRS_SELECTION_LIMIT?: string;
+            MIN_TICKS_FOR_ORDER_TRIGGERING?: string;
         }
     }
 }
@@ -49,6 +50,7 @@ const config = {
     PAIR_EXPIRATION_HOURS: process.env.PAIR_EXPIRATION_HOURS ?? "24",
     PAIR_FINDER_API_URL: process.env.PAIR_FINDER_API_URL,
     PAIRS_SELECTION_LIMIT: process.env.PAIRS_SELECTION_LIMIT ?? "1000",
+    MIN_TICKS_FOR_ORDER_TRIGGERING: process.env.MIN_TICKS_FOR_ORDER_TRIGGERING ?? "3",
 };
 
 if(config.SESSION_SECRET === undefined)

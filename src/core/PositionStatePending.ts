@@ -9,12 +9,14 @@ export class PositionStatePending extends PositionState
 {
     private lastPnlUpdateTimestamp: number;
     private isLiquidating: boolean;
+    private lastTicksTriggerStatus: boolean[];
 
     constructor(context: PositionContext)
     {
         super(context);
         this.lastPnlUpdateTimestamp = 0;
         this.isLiquidating = false;
+        this.lastTicksTriggerStatus = [];
 
         if(!this.context.residualFeed)
         {
@@ -54,7 +56,12 @@ export class PositionStatePending extends PositionState
             const stopLossTriggered = stopLoss === undefined ? false : stopLoss.greaterThan(residual);
             const takeProfitTriggered = takeProfit === undefined ? false : takeProfit.lessThan(residual);
 
-            if(stopLossTriggered || takeProfitTriggered)
+            this.lastTicksTriggerStatus.push(stopLossTriggered || takeProfitTriggered);
+            this.lastTicksTriggerStatus = this.lastTicksTriggerStatus.slice(-config.MIN_TICKS_FOR_ORDER_TRIGGERING);
+
+            const allTicksTriggered = this.lastTicksTriggerStatus.every(tick => tick) && this.lastTicksTriggerStatus.length === +config.MIN_TICKS_FOR_ORDER_TRIGGERING;
+
+            if(allTicksTriggered)
                 await this.liquidate();
         }
         else if(this.context.position.side === "Short")
@@ -62,7 +69,12 @@ export class PositionStatePending extends PositionState
             const stopLossTriggered = stopLoss === undefined ? false : stopLoss.lessThan(residual);
             const takeProfitTriggered = takeProfit === undefined ? false : takeProfit.greaterThan(residual);
 
-            if(stopLossTriggered || takeProfitTriggered)
+            this.lastTicksTriggerStatus.push(stopLossTriggered || takeProfitTriggered);
+            this.lastTicksTriggerStatus = this.lastTicksTriggerStatus.slice(-config.MIN_TICKS_FOR_ORDER_TRIGGERING);
+
+            const allTicksTriggered = this.lastTicksTriggerStatus.every(tick => tick) && this.lastTicksTriggerStatus.length === +config.MIN_TICKS_FOR_ORDER_TRIGGERING;
+
+            if(allTicksTriggered)
                 await this.liquidate();
         }
     }

@@ -1,4 +1,5 @@
 import Decimal from "decimal.js";
+import config from "../config.js";
 import { OrderState } from "./OrderState.js";
 import { OrderContext } from "./OrderContext.js";
 import { OrderStateExecute } from "./OrderStateExecute.js";
@@ -10,12 +11,14 @@ export class OrderStatePending extends OrderState
 {
     private isTriggered: boolean;
     private triggerDirection: TriggerDirection;
+    private lastTicksTriggerStatus: boolean[];
 
     constructor(context: OrderContext)
     {
         super(context);
         this.isTriggered = false;
         this.triggerDirection = "None";
+        this.lastTicksTriggerStatus = [];
     }
 
     public async initialize()
@@ -64,7 +67,12 @@ export class OrderStatePending extends OrderState
         const fromTopTriggered = this.triggerDirection === "FromTop" && residual.lessThan(entryResidual);
         const triggered = fromBottomTriggered || fromTopTriggered;
 
-        if(triggered && !(this.context.State instanceof OrderStateExecute))
+        this.lastTicksTriggerStatus.push(triggered);
+        this.lastTicksTriggerStatus = this.lastTicksTriggerStatus.slice(-config.MIN_TICKS_FOR_ORDER_TRIGGERING);
+
+        const allTicksTriggered = this.lastTicksTriggerStatus.every(tick => tick) && this.lastTicksTriggerStatus.length === +config.MIN_TICKS_FOR_ORDER_TRIGGERING;
+
+        if(allTicksTriggered && !(this.context.State instanceof OrderStateExecute))
         {
             this.isTriggered = true;
             await this.context.transitionTo(new OrderStateExecute(this.context));
