@@ -30,14 +30,14 @@ export class OrderCoordinatorProvider
         this.orderCoordinators = new Map();
     }
 
-    public get(apiKey: string, apiSecret: string, demoTrading: boolean)
+    public get(userId: string, apiKey: string, apiSecret: string, demoTrading: boolean)
     {
         let foundOrderCoordinator = this.orderCoordinators.get(apiKey);
         if(foundOrderCoordinator === undefined)
         {
             const restClient = this.bybitRestClientProvider.get(apiKey, apiSecret, demoTrading);
-            const positionCoordinator = this.positionCoordinatorProvider.get(apiKey, apiSecret, demoTrading);
-            foundOrderCoordinator = new OrderCoordinator(restClient, this.wsClient, this.residualFeedProvider, this.instInfoProvider, this.tickerProvider, positionCoordinator);
+            const positionCoordinator = this.positionCoordinatorProvider.get(userId, apiKey, apiSecret, demoTrading);
+            foundOrderCoordinator = new OrderCoordinator(userId, restClient, this.wsClient, this.residualFeedProvider, this.instInfoProvider, this.tickerProvider, positionCoordinator);
             this.orderCoordinators.set(apiKey, foundOrderCoordinator);
         }
 
@@ -61,8 +61,8 @@ export class OrderCoordinatorProvider
             if(foundOrderCoordinator === undefined)
             {
                 const restClient = this.bybitRestClientProvider.get(credential.key, credential.secret, credential.demoTrading);
-                const positionCoordinator = this.positionCoordinatorProvider.get(credential.key, credential.secret, credential.demoTrading);
-                foundOrderCoordinator = new OrderCoordinator(restClient, this.wsClient, this.residualFeedProvider, this.instInfoProvider, this.tickerProvider, positionCoordinator);
+                const positionCoordinator = this.positionCoordinatorProvider.get(credential.userId, credential.key, credential.secret, credential.demoTrading);
+                foundOrderCoordinator = new OrderCoordinator(credential.userId, restClient, this.wsClient, this.residualFeedProvider, this.instInfoProvider, this.tickerProvider, positionCoordinator);
                 this.orderCoordinators.set(credential.key, foundOrderCoordinator);
             }
         }

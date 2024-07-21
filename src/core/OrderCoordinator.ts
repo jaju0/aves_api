@@ -26,6 +26,7 @@ export interface OrderCreationParams
 export class OrderCoordinator
 {
     private orderContexts: Map<string, OrderContext>;
+    private userId: string;
     private restClient: RestClientV5;
     private wsClient: WebsocketClient;
     private residualFeedProvider: ResidualFeedProvider;
@@ -35,9 +36,10 @@ export class OrderCoordinator
 
     private initPromise: Promise<void>;
 
-    constructor(restClient: RestClientV5, wsClient: WebsocketClient, residualFeedProvider: ResidualFeedProvider, instInfoProvider: InstrumentsInfoProvider, tickerProvider: TickerProvider, positionCoordinator: PositionCoordinator)
+    constructor(userId: string, restClient: RestClientV5, wsClient: WebsocketClient, residualFeedProvider: ResidualFeedProvider, instInfoProvider: InstrumentsInfoProvider, tickerProvider: TickerProvider, positionCoordinator: PositionCoordinator)
     {
         this.orderContexts = new Map();
+        this.userId = userId;
         this.restClient = restClient;
         this.wsClient = wsClient;
         this.residualFeedProvider = residualFeedProvider;
@@ -99,6 +101,7 @@ export class OrderCoordinator
     private async initialize()
     {
         const dbOrders = await Order.find({
+            ownerId: this.userId,
             status: { $in: ["New", "Pending"] },
         });
 

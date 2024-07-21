@@ -68,7 +68,7 @@ export async function getPositionListHandler(positionCoordinatorProvider: Positi
     else if(activeCredential == undefined)
         return res.sendStatus(400);
 
-    const positionCoordinator = positionCoordinatorProvider.get(activeCredential.key, activeCredential.secret, activeCredential.demoTrading);
+    const positionCoordinator = positionCoordinatorProvider.get(req.user.id, activeCredential.key, activeCredential.secret, activeCredential.demoTrading);
 
     const activePositionList = new Array<PositionData>();
     for(const context of positionCoordinator.PositionContexts.values())
@@ -94,7 +94,7 @@ export async function liquidationHandler(positionCoordinatorProvider: PositionCo
     const data = req.body;
 
     const pair = `${req.user.id}-${data.symbol1}-${data.symbol2}`;
-    const positionCoordinator = positionCoordinatorProvider.get(activeCredential.key, activeCredential.secret, activeCredential.demoTrading);
+    const positionCoordinator = positionCoordinatorProvider.get(req.user.id, activeCredential.key, activeCredential.secret, activeCredential.demoTrading);
     const context = positionCoordinator.PositionContexts.get(pair);
     if(context === undefined)
         return res.sendStatus(404);
@@ -118,7 +118,7 @@ export async function positionAmendmentHandler(positionCoordinatorProvider: Posi
     const data = req.body;
 
     const pair = `${req.user.id}-${data.symbol1}-${data.symbol2}`;
-    const positionCoordinator = positionCoordinatorProvider.get(activeCredential.key, activeCredential.secret, activeCredential.demoTrading);
+    const positionCoordinator = positionCoordinatorProvider.get(req.user.id, activeCredential.key, activeCredential.secret, activeCredential.demoTrading);
     const context = positionCoordinator.PositionContexts.get(pair);
     if(context === undefined)
         return res.sendStatus(404);

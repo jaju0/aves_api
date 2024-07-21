@@ -25,14 +25,16 @@ export class PositionCoordinator
     public readonly positionContexts: Map<string, PositionContext>;
     public readonly initPromise: Promise<void>;
 
+    private userId: string;
     private restClient: RestClientV5;
     private wsClient: WebsocketClient;
     private residualFeedProvider: ResidualFeedProvider;
     private tickerFeedProvider: TickerFeedProvider;
 
-    constructor(restClient: RestClientV5, wsClient: WebsocketClient, residualFeedProvider: ResidualFeedProvider, tickerFeedProvider: TickerFeedProvider)
+    constructor(userId: string, restClient: RestClientV5, wsClient: WebsocketClient, residualFeedProvider: ResidualFeedProvider, tickerFeedProvider: TickerFeedProvider)
     {
         this.positionContexts = new Map();
+        this.userId = userId;
         this.restClient = restClient;
         this.wsClient = wsClient;
         this.residualFeedProvider = residualFeedProvider;
@@ -104,7 +106,7 @@ export class PositionCoordinator
 
     private async initialize()
     {
-        const dbPositions = await Position.find({ open: true });
+        const dbPositions = await Position.find({ ownerId: this.userId, open: true });
 
         for(const dbPosition of dbPositions)
         {

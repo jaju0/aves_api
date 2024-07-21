@@ -98,7 +98,7 @@ export async function orderSubmitionHandler(orderCoordinatorProvider: OrderCoord
     else if(activeCredential == undefined)
         return res.sendStatus(400);
 
-    const orderCoordinator = orderCoordinatorProvider.get(activeCredential.key, activeCredential.secret, activeCredential.demoTrading);
+    const orderCoordinator = orderCoordinatorProvider.get(req.user.id, activeCredential.key, activeCredential.secret, activeCredential.demoTrading);
 
     const orderContext = await orderCoordinator.createOrder({
         ownerId: req.user.id,
@@ -134,7 +134,7 @@ export async function orderAmendmentHandler(orderCoordinatorProvider: OrderCoord
     else if(activeCredential == undefined)
         return res.sendStatus(400);
 
-    const orderCoordinator = orderCoordinatorProvider.get(activeCredential.key, activeCredential.secret, activeCredential.demoTrading);
+    const orderCoordinator = orderCoordinatorProvider.get(req.user.id, activeCredential.key, activeCredential.secret, activeCredential.demoTrading);
     const orderData = orderCoordinator.getOrderData(req.body.orderId);
     if(orderData === undefined)
         return res.sendStatus(404);
@@ -158,7 +158,7 @@ export async function orderCancelationHandler(orderCoordinatorProvider: OrderCoo
     else if(activeCredential == undefined)
         return res.sendStatus(400);
     
-    const orderCoordinator = orderCoordinatorProvider.get(activeCredential.key, activeCredential.secret, activeCredential.demoTrading);
+    const orderCoordinator = orderCoordinatorProvider.get(req.user.id, activeCredential.key, activeCredential.secret, activeCredential.demoTrading);
     const orderData = orderCoordinator.getOrderData(req.body.orderId);
     if(orderData === undefined)
         return res.sendStatus(404);
@@ -178,7 +178,7 @@ export async function orderListHandler(orderCoordinatorProvider: OrderCoordinato
     else if(activeCredential == undefined)
         return res.sendStatus(400);
 
-    const orderCoordinator = orderCoordinatorProvider.get(activeCredential.key, activeCredential.secret, activeCredential.demoTrading);
+    const orderCoordinator = orderCoordinatorProvider.get(req.user.id, activeCredential.key, activeCredential.secret, activeCredential.demoTrading);
 
     const activeOrderList = new Array<OrderData>();
     for(const context of orderCoordinator.OrderContexts.values())

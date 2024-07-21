@@ -24,13 +24,13 @@ export class PositionCoordinatorProvider
         this.positionCoordinators = new Map();
     }
 
-    public get(apiKey: string, apiSecret: string, demoTrading: boolean)
+    public get(userId: string, apiKey: string, apiSecret: string, demoTrading: boolean)
     {
         let foundPositionCoordinator = this.positionCoordinators.get(apiKey);
         if(foundPositionCoordinator === undefined)
         {
             const restClient = this.bybitRestClientProvider.get(apiKey, apiSecret, demoTrading);
-            foundPositionCoordinator = new PositionCoordinator(restClient, this.wsClient, this.residualFeedProvider, this.tickerFeedProvider);
+            foundPositionCoordinator = new PositionCoordinator(userId, restClient, this.wsClient, this.residualFeedProvider, this.tickerFeedProvider);
             this.positionCoordinators.set(apiKey, foundPositionCoordinator);
         }
 
@@ -52,7 +52,7 @@ export class PositionCoordinatorProvider
             if(foundPositionCoordinator === undefined)
             {
                 const restClient = this.bybitRestClientProvider.get(credential.key, credential.secret, credential.demoTrading);
-                foundPositionCoordinator = new PositionCoordinator(restClient, this.wsClient, this.residualFeedProvider, this.tickerFeedProvider);
+                foundPositionCoordinator = new PositionCoordinator(credential.userId, restClient, this.wsClient, this.residualFeedProvider, this.tickerFeedProvider);
                 this.positionCoordinators.set(credential.key, foundPositionCoordinator);
             }
         }
